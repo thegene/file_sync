@@ -8,11 +8,6 @@ defmodule FileSync do
 
   ## Examples
 
-      iex> FileSync.hello
-      :world
 
   """
-  def hello do
-    :world
-  end
 end
