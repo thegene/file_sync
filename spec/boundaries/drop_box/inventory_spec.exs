@@ -18,12 +18,26 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
       |> double
       |> allow(:post, fn(_, _) -> response() end)
     
-    context "the http request" do
-      let response: %{body: Poison.encode!(%{entries: "foo"})}
+    let :response, do:
+      fixture_path()
+      |> File.read!
+      |> Poison.decode!(as: %HTTPotion.Response{})
 
-      it "calls HTTPotion according to DropBox's API" do
-        expect(subject())
-        |>to(eq("foo"))
+    context "the http request" do
+      let :fixture_path, do:
+        Path.join([
+          "spec",
+          "fixtures",
+          "boundaries",
+          "drop_box",
+          "inventory_get.json"
+        ])
+
+      it "returns a list of 2000 things" do
+        subject()
+        |> length
+        |> expect
+        |> to(eq(2000))
       end
     end
   end
