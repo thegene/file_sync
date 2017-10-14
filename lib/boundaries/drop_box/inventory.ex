@@ -7,7 +7,20 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     |> Map.get(:body)
     |> Poison.decode!
     |> Map.get("entries")
+    |> build_return_struct
   end
+
+  defp build_return_struct(entries) do
+    %{
+      items: entries
+    }
+  end
+
+  #defp build_inventory_list(entries) do
+  #  entries
+  #  |> Enum.map
+  #  |> struct(%FileSync.InventoryItem{})
+  #end
 
   defp default_post_opts do
     %{

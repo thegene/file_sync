@@ -59,9 +59,13 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
 
       it "returns a list of 2000 things" do
         subject()
+        |> Map.get(:items)
         |> length
         |> expect
         |> to(eq(2000))
+      end
+
+      xit "returns InventoryListItems" do
       end
     end
 
@@ -70,6 +74,7 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
 
       it "returns a list of 21 things" do
         subject()
+        |> Map.get(:items)
         |> length
         |> expect
         |> to(eq(21))
