@@ -1,20 +1,28 @@
-defmodule Boundaries.DropBox.ListFiles do
+defmodule FileSync.Boundaries.DropBox.Inventory do
 
-  def try do
-    post
+  def get(opts) do
+    opts
+    |> Enum.into(default_post_opts())
+    |> post
     |> Map.get(:body)
     |> Poison.decode!
     |> Map.get("entries")
   end
 
-  defp post do
-    HTTPotion.post(url, post_settings)
+  defp default_post_opts do
+    %{
+      http: HTTPotion
+    }
+  end
+
+  defp post(%{http: http}) do
+    http.post(url(), post_settings())
   end
 
   defp post_settings do
     [
-      body: data,
-      headers: headers,
+      body: data(),
+      headers: headers(),
       timeout: 10_000
     ]
   end
@@ -26,7 +34,7 @@ defmodule Boundaries.DropBox.ListFiles do
 
   defp headers do
     [
-      "Authorization": "Bearer #{token}",
+      "Authorization": "Bearer #{token()}",
       "Content-Type": "application/json" 
     ]
   end
