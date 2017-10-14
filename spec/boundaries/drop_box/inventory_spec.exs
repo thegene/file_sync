@@ -58,7 +58,9 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
       let folder: "foo"
 
       it "returns a list of 2000 things" do
-        subject()
+        {:list, list} = subject()
+
+        list
         |> Map.get(:items)
         |> length
         |> expect
@@ -73,7 +75,9 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
       let folder: "bar"
 
       it "returns a list of 21 things" do
-        subject()
+        {:list, list} = subject()
+
+        list
         |> Map.get(:items)
         |> length
         |> expect
