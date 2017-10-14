@@ -15,13 +15,13 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     }
   end
 
-  defp post(%{http: http}) do
-    http.post(url(), post_settings())
+  defp post(%{http: http, folder: folder}) do
+    http.post(url(), post_settings(%{folder: folder}))
   end
 
-  defp post_settings do
+  defp post_settings(opts) do
     [
-      body: data(),
+      body: data(opts),
       headers: headers(),
       timeout: 10_000
     ]
@@ -39,9 +39,9 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     ]
   end
 
-  defp data do
+  defp data(%{folder: folder}) do
     %{
-      "path": "/camera uploads",
+      "path": "/#{folder}",
       "recursive": false,
       "include_media_info": false,
       "include_deleted": false,

@@ -5,8 +5,25 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
 
   import Double
 
-  context "Given a list of files from a dropbox folder" do
-    let folder: "foo bar"
+  context "Given a list of files exists in dropbox" do
+    let :foo_fixture_path, do:
+      Path.join([
+        "spec",
+        "fixtures",
+        "boundaries",
+        "drop_box",
+        "inventory_get_foo.json"
+      ])
+
+    let :bar_fixture_path, do:
+      Path.join([
+        "spec",
+        "fixtures",
+        "boundaries",
+        "drop_box",
+        "inventory_get_bar.json"
+      ])
+
     let inventory_opts: %{folder: folder(), http: http()}
 
     let :subject, do:
@@ -16,28 +33,46 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
     let :http, do:
       HTTPotion
       |> double
-      |> allow(:post, fn(_, _) -> response() end)
+      |> allow(:post, fn(_url, post_opts) ->
+          path = Keyword.fetch!(post_opts, :body)
+                 |> Poison.decode!
+                 |> Map.get("path")
+
+          case path do
+            "/foo" -> foo_response()
+            "/bar" -> bar_response()
+          end
+        end)
     
-    let :response, do:
-      fixture_path()
+    let :bar_response, do:
+      bar_fixture_path()
       |> File.read!
       |> Poison.decode!(as: %HTTPotion.Response{})
 
-    context "the http request" do
-      let :fixture_path, do:
-        Path.join([
-          "spec",
-          "fixtures",
-          "boundaries",
-          "drop_box",
-          "inventory_get.json"
-        ])
+    let :foo_response, do:
+      foo_fixture_path()
+      |> File.read!
+      |> Poison.decode!(as: %HTTPotion.Response{})
+
+    context "when we specify a folder with at least 2000 items" do
+      let folder: "foo"
 
       it "returns a list of 2000 things" do
         subject()
         |> length
         |> expect
         |> to(eq(2000))
+      end
+    end
+
+    context "when we specify a folder with only 21 items" do
+      let folder: "bar"
+
+      it "returns a list of 21 things" do
+        subject()
+        |> length
+        |> expect
+        |> to(eq(21))
       end
     end
   end
