@@ -4,9 +4,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     opts
     |> Enum.into(default_post_opts())
     |> post
-    |> Map.get(:body)
-    |> Poison.decode!
-    |> Map.get("entries")
+    |> parse_response
     |> build_return_struct
   end
 
@@ -21,6 +19,13 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
   #  |> Enum.map
   #  |> struct(%FileSync.InventoryItem{})
   #end
+
+  defp parse_response(response) do
+    response
+    |> Map.get(:body)
+    |> Poison.decode!
+    |> Map.get("entries")
+  end
 
   defp default_post_opts do
     %{
