@@ -5,6 +5,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     |> Enum.into(default_post_opts())
     |> post
     |> parse_response
+    |> cast_entries
     |> build_return_struct
   end
 
@@ -14,11 +15,17 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     }}
   end
 
-  #defp build_inventory_list(entries) do
-  #  entries
-  #  |> Enum.map
-  #  |> struct(%FileSync.InventoryItem{})
-  #end
+  defp cast_entries(entries) do
+    entries
+    |> Enum.map(fn(entry) -> cast_single_entry(entry) end)
+  end
+
+  defp cast_single_entry(entry) do
+    %FileSync.Data.InventoryItem {
+      name: entry["name"],
+      size: entry["size"]
+    }
+  end
 
   defp parse_response(response) do
     response

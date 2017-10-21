@@ -70,8 +70,20 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
         |> to(eq(2000))
       end
 
-      it "returns InventoryListItems" do
-        list = list()
+      context "the returned InventoryListItems" do
+        let :inventory_item do
+          list()
+          |> Map.get(:items)
+          |> List.first
+        end
+
+        it "has a name" do
+          expect(inventory_item().name).to eq("2016-10-21 13.40.57.jpg")
+        end
+
+        it "has a size" do
+          expect(inventory_item().size).to eq(1958802)
+        end
       end
     end
 
