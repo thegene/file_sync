@@ -54,20 +54,24 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
       |> File.read!
       |> Poison.decode!(as: %HTTPotion.Response{})
 
+    let :list do
+      {:ok, list} = subject()
+      list
+    end
+
     context "when we specify a folder with at least 2000 items" do
       let folder: "foo"
 
       it "returns a list of 2000 things" do
-        {:list, list} = subject()
-
-        list
+        list()
         |> Map.get(:items)
         |> length
         |> expect
         |> to(eq(2000))
       end
 
-      xit "returns InventoryListItems" do
+      it "returns InventoryListItems" do
+        list = list()
       end
     end
 
@@ -75,9 +79,7 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
       let folder: "bar"
 
       it "returns a list of 21 things" do
-        {:list, list} = subject()
-
-        list
+        list()
         |> Map.get(:items)
         |> length
         |> expect

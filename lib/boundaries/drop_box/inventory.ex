@@ -9,7 +9,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
   end
 
   defp build_return_struct(entries) do
-    {:list, %{
+    {:ok, %{
       items: entries
     }}
   end
