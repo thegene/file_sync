@@ -27,7 +27,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     }
   end
 
-  defp parse_response(response) do
+  defp parse_response({:ok, response}) do
     response
     |> Map.get(:body)
     |> Poison.decode!
@@ -41,7 +41,18 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
   end
 
   defp post(%{http: http, folder: folder}) do
-    http.post(url(), post_settings(%{folder: folder}))
+    http.post(
+              url(),
+              body(folder),
+              headers(),
+              options()
+            )
+  end
+
+  defp options do
+    [
+      timeout: 8000
+    ]
   end
 
   defp post_settings(opts) do
@@ -64,7 +75,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     ]
   end
 
-  defp data(%{folder: folder}) do
+  defp body(folder) do
     %{
       "path": "/#{folder}",
       "recursive": false,
