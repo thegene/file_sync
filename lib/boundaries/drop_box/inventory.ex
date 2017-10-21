@@ -36,7 +36,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
 
   defp default_post_opts do
     %{
-      http: HTTPotion
+      http: HTTPoison
     }
   end
 

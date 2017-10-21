@@ -16,7 +16,7 @@ defmodule FileSync.Mixfile do
   def application do
     [
       extra_applications: [:logger],
-      applications: [:httpotion]
+      applications: [:httpoison]
     ]
   end
 
@@ -25,7 +25,7 @@ defmodule FileSync.Mixfile do
     [
       {:espec, "~> 1.4.6", only: :test},
       {:double, "~> 0.6.2", only: :test},
-      {:httpotion, "~> 3.0.2"},
+      {:httpoison, "~> 0.13"},
       {:poison, "~> 3.1"}
     ]
   end

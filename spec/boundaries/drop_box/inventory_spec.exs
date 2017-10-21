@@ -31,7 +31,7 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
       |> Inventory.get
 
     let :http, do:
-      HTTPotion
+      HTTPoison
       |> double
       |> allow(:post, fn(_url, post_opts) ->
           path = Keyword.fetch!(post_opts, :body)
@@ -47,12 +47,12 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
     let :bar_response, do:
       bar_fixture_path()
       |> File.read!
-      |> Poison.decode!(as: %HTTPotion.Response{})
+      |> Poison.decode!(as: %HTTPoison.Response{})
 
     let :foo_response, do:
       foo_fixture_path()
       |> File.read!
-      |> Poison.decode!(as: %HTTPotion.Response{})
+      |> Poison.decode!(as: %HTTPoison.Response{})
 
     let :list do
       {:ok, list} = subject()
@@ -70,7 +70,7 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
         |> to(eq(2000))
       end
 
-      context "the returned InventoryListItems" do
+      context "the returned InventoryItem" do
         let :inventory_item do
           list()
           |> Map.get(:items)
