@@ -2,8 +2,11 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
   use ESpec
 
   alias FileSync.Boundaries.DropBox.Inventory
+  alias FileSync.Data.{InventoryFolder}
 
   import Double
+
+  require IEx
 
   context "Given a list of files exists in dropbox" do
     let :foo_fixture_path, do:
@@ -39,8 +42,8 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
                    |> Map.fetch!("path")
 
           case path do
-            "/foo" -> foo_response()
-            "/bar" -> bar_response()
+            "/foo" -> {:ok, foo_response()}
+            "/bar" -> {:ok, bar_response()}
           end
         end)
 
@@ -96,6 +99,15 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
         |> length
         |> expect
         |> to(eq(21))
+      end
+
+      it "returns a sub folder" do
+        list()
+        |> Map.get(:items)
+        |> Enum.filter(fn(item) -> match?(%InventoryFolder{}, item) end)
+        |> length
+        |> expect
+        |> to(eq(1))
       end
     end
   end

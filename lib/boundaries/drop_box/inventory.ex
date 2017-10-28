@@ -1,36 +1,12 @@
 defmodule FileSync.Boundaries.DropBox.Inventory do
 
+  alias FileSync.Boundaries.DropBox.ResponseParser
+
   def get(opts) do
     opts
     |> Enum.into(default_post_opts())
     |> post
-    |> parse_response
-    |> cast_entries
-    |> build_return_struct
-  end
-
-  defp build_return_struct(entries) do
-    {:ok, %{
-      items: entries
-    }}
-  end
-
-  defp cast_entries(entries) do
-    entries
-    |> Enum.map(fn(entry) -> cast_single_entry(entry) end)
-  end
-
-  defp cast_single_entry(entry) do
-    %FileSync.Data.InventoryItem {
-      name: entry["name"],
-      size: entry["size"]
-    }
-  end
-
-  defp parse_response(%HTTPoison.Response{body: body}) do
-    body
-    |> Poison.decode!
-    |> Map.get("entries")
+    |> ResponseParser.parse
   end
 
   defp default_post_opts do
@@ -51,14 +27,6 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
   defp options do
     [
       timeout: 8000
-    ]
-  end
-
-  defp post_settings(opts) do
-    [
-      body: data(opts),
-      headers: headers(),
-      timeout: 10_000
     ]
   end
 
