@@ -33,17 +33,17 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
     let :http, do:
       HTTPoison
       |> double
-      |> allow(:post, fn(_url, post_opts) ->
-          path = Keyword.fetch!(post_opts, :body)
-                 |> Poison.decode!
-                 |> Map.get("path")
+      |> allow(:post, fn(_url, body, _headers, _options) ->
+          path = body
+                   |> Poison.decode!
+                   |> Map.fetch!("path")
 
           case path do
             "/foo" -> foo_response()
             "/bar" -> bar_response()
           end
         end)
-    
+
     let :bar_response, do:
       bar_fixture_path()
       |> File.read!
