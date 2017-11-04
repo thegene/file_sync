@@ -33,8 +33,13 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
             "rev" => "20f637cc1c83",
             "server_modified" => "2016-03-24T03:16:27Z",
             "size" => 8744156
+          }, %{
+            ".tag" => "folder",
+            "id" => "id:XrjEav4csTAAAAAAAAAAAQ",
+            "name" => "thumbs",
+            "path_display" => "/harrison birth/thumbs",
+            "path_lower" => "/harrison birth/thumbs"
           }]
-
         def handle_folder("foo") do
           {:ok, %{"entries" => folder_contents()}}
         end
@@ -44,6 +49,16 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
           list
           |> Map.get(:items)
           |> Enum.filter(fn(item) -> match?(%InventoryItem{}, item) end)
+          |> length
+          |> expect
+          |> to(eq(1))
+        end
+
+        it "also parses the resulting folder contents into inventory folders" do
+          {:ok, list} = subject()
+          list
+          |> Map.get(:items)
+          |> Enum.filter(fn(item) -> match?(%InventoryFolder{}, item) end)
           |> length
           |> expect
           |> to(eq(1))
