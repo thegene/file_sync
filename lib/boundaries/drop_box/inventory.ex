@@ -8,11 +8,15 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
     |> parse
   end
 
-  def parse({:ok, response}) do
+  defp parse({:ok, response}) do
     response
     |> Map.get("entries")
     |> cast_entries
     |> build_successful_response
+  end
+
+  defp parse({:error, reason}) do
+    {:error, reason}
   end
 
   defp build_successful_response(entries) do
