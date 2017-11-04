@@ -2,59 +2,46 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
 
   alias FileSync.Boundaries.DropBox.ResponseParser
 
-  def get(opts) do
-    opts
-    |> Enum.into(default_post_opts())
-    |> post
-    |> ResponseParser.parse
+  def get(folder: folder, client: client) do
+    folder
+    |> client.list_folder
+    |> parse
   end
 
-  defp default_post_opts do
-    %{
-      http: HTTPoison
+  def parse({:ok, response}) do
+    response
+    |> Map.get("entries")
+    |> cast_entries
+    |> build_successful_response
+  end
+
+  defp build_successful_response(entries) do
+    {:ok, %{items: entries}}
+  end
+
+  defp cast_entries(entries) do
+    entries
+    |> Enum.map(fn(entry) -> cast_single_entry(entry) end)
+  end
+
+  defp cast_single_entry(%{
+                           ".tag" => "file",
+                           "name" => name,
+                           "size" => size
+                         }) do
+    %FileSync.Data.InventoryItem {
+      name: name,
+      size: size
     }
   end
 
-  defp post(%{folder: folder, http: http}) do
-    http.post(
-              url(),
-              body(folder),
-              headers(),
-              options()
-            )
-  end
-
-  defp options do
-    [
-      timeout: 8000
-    ]
-  end
-
-  defp token do
-    File.read!("tmp/dropbox_token")
-    |> String.trim
-  end
-
-  defp headers do
-    [
-      "Authorization": "Bearer #{token()}",
-      "Content-Type": "application/json" 
-    ]
-  end
-
-  defp body(folder) do
-    %{
-      "path": "/#{folder}",
-      "recursive": false,
-      "include_media_info": false,
-      "include_deleted": false,
-      "include_has_explicit_shared_members": false,
-      "include_mounted_folders": true
+  defp cast_single_entry(%{
+                           ".tag" => "folder",
+                           "name" => name
+                         }) do
+    %FileSync.Data.InventoryFolder {
+      name: name
     }
-    |> Poison.encode!
   end
 
-  defp url do
-    "https://api.dropboxapi.com/2/files/list_folder"
-  end
 end

@@ -1,14 +1,55 @@
 defmodule FileSync.Boundaries.DropBox.InventorySpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.Inventory
-  alias FileSync.Data.{InventoryFolder}
+  alias FileSync.Boundaries.DropBox.{Inventory, Client}
+  alias FileSync.Data.{InventoryFolder, InventoryItem}
 
   import Double
 
   require IEx
 
-  context "Given a list of files exists in dropbox" do
+  context "Given a dropbox client" do
+    let :client, do:
+      Client
+      |> double
+      |> allow(:list_folder, fn(requested_folder) ->
+        handle_folder(requested_folder)
+      end)
+
+    context "when we request a folder's contents" do
+      let subject: Inventory.get(folder: "foo", client: client())
+      let :folder_contents, do:
+        [%{
+          ".tag" => "file",
+          "client_modified" => "2016-03-24T03:16:27Z",
+          "content_hash" => "3d0856b16890dcfcaba659bc62f51530ca56277e3710f3dba618ce1cb10ca294",
+          "id" => "id:YWZvn7UeTVAAAAAAAAAQDQ",
+          "name" => "IMG_0278.jpg",
+          "path_display" => "/harrison birth/IMG_0278.jpg",
+          "path_lower" => "/harrison birth/img_0278.jpg",
+          "rev" => "20f637cc1c83",
+          "server_modified" => "2016-03-24T03:16:27Z",
+          "size" => 8744156
+        }]
+
+      def handle_folder("foo") do
+        {:ok, %{"entries" => folder_contents()}}
+      end
+
+      it "parses the resulting folder contents into inventory items" do
+        {:ok, list} = subject()
+        list
+        |> Map.get(:items)
+        |> Enum.filter(fn(item) -> match?(%InventoryItem{}, item) end)
+        |> length
+        |> expect
+        |> to(eq(1))
+      end
+
+    end
+  end
+
+  xcontext "Given a list of files exists in dropbox" do
     let :foo_fixture_path, do:
       Path.join([
         "spec",
