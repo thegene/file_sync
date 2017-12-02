@@ -1,36 +1,16 @@
 defmodule FileSync.Boundaries.DropBox.Client do
-  alias FileSync.Boundaries.DropBox.Response
+  alias FileSync.Boundaries.DropBox.ParseResponse
 
   def list_folder(opts) do
     default_post_opts
     |> Map.merge(opts)
     |> post
-    |> parse
+    |> ParseResponse.from_httpoison
     |> respond
   end
 
   defp respond(response) do
     {:ok, response}
-  end
-
-  defp parse(%{"status_code" => code, "headers" => headers, "body" => body}) do
-    %Response{
-      status_code: code,
-      headers: headers["hdrs"],
-      body: parse_response_body(body)
-    }
-  end
-
-  defp parse_response_body(body) do
-    body
-    |> Poison.decode!
-    |> build_response_body
-  end
-
-  defp build_response_body(body) do
-    %{
-      entries: body["entries"]
-    }
   end
 
   defp default_post_opts do
