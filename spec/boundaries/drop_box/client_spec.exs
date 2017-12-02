@@ -31,6 +31,13 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
         {:ok, response} = subject()
         expect(response.status_code).to eq(200)
 			end
+
+      it "makes headers available" do
+        {:ok, response} = subject()
+        response.headers["x-dropbox-request-id"]
+        |> expect
+        |> to(eq("8711e060f291f386b39a3890cbce15b2"))
+      end
     end
 
     xcontext "which returns a drop box error" do

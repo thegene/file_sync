@@ -13,9 +13,10 @@ defmodule FileSync.Boundaries.DropBox.Client do
     {:ok, response}
   end
 
-  defp parse(%{"status_code" => code}) do
+  defp parse(%{"status_code" => code, "headers" => headers}) do
     %Response{
-      status_code: code
+      status_code: code,
+      headers: headers["hdrs"]
     }
   end
 
