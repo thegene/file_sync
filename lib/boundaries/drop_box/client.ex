@@ -1,5 +1,22 @@
 defmodule FileSync.Boundaries.DropBox.Client do
+  alias FileSync.Boundaries.DropBox.Response
+
   def list_folder(opts) do
+    default_post_opts
+    |> Map.merge(opts)
+    |> post
+    |> parse
+    |> respond
+  end
+
+  defp respond(response) do
+    {:ok, response}
+  end
+
+  defp parse(%{"status_code" => code}) do
+    %Response{
+      status_code: code
+    }
   end
 
   defp default_post_opts do
