@@ -22,9 +22,11 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
         HTTPoison
         |> double
         |> allow(:post, fn(_url, _body, _headers, _options) ->
-          fixtures_path()
-          |> File.read!
-          |> Poison.decode!
+          response =
+            fixtures_path()
+            |> File.read!
+            |> Poison.decode!
+          {:ok, response}
         end)
 
 			it "has 200 status code" do

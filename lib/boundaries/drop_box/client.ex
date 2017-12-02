@@ -5,6 +5,11 @@ defmodule FileSync.Boundaries.DropBox.Client do
     default_post_opts
     |> Map.merge(opts)
     |> post
+    |> handle_response
+  end
+
+  defp handle_response({:ok, response}) do
+    response
     |> ParseResponse.from_httpoison
     |> respond
   end
