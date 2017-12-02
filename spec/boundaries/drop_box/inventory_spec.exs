@@ -12,12 +12,12 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
     let :client, do:
       Client
       |> double
-      |> allow(:list_folder, fn(requested_folder) ->
+      |> allow(:list_folder, fn(%{folder: requested_folder}) ->
         handle_folder(requested_folder)
       end)
 
     context "when we request a folder's contents" do
-      let subject: Inventory.get(folder: folder(), client: client())
+      let subject: Inventory.get(%{folder: folder(), client: client()})
 
       context "and the request is successful" do
         let folder: "foo"
