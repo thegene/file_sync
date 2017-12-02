@@ -88,7 +88,18 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
       end
     end
 
-    xcontext "which times out" do
+    context "which times out" do
+      let :mock_http, do:
+        HTTPoison
+        |> double
+        |> allow(:post, fn(_url, _body, _headers, _options) ->
+          {:error, %HTTPoison.Error{id: nil, reason: :connect_timeout}}
+        end)
+
+      it "results in an error message" do
+        {:error, message} = subject()
+        expect(message).to eq("request timed out")
+      end
     end
   end
 end

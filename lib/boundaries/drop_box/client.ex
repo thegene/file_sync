@@ -2,7 +2,7 @@ defmodule FileSync.Boundaries.DropBox.Client do
   alias FileSync.Boundaries.DropBox.ResponseParser
 
   def list_folder(opts) do
-    default_post_opts
+    default_post_opts()
     |> Map.merge(opts)
     |> post
     |> handle_response
@@ -12,6 +12,10 @@ defmodule FileSync.Boundaries.DropBox.Client do
     response
     |> ResponseParser.parse
     |> respond
+  end
+
+  defp handle_response({:error, %{reason: :connect_timeout}}) do
+    {:error, "request timed out"}
   end
 
   defp respond(response = %{status_code: 200}) do
