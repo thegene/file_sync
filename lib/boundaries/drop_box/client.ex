@@ -1,5 +1,5 @@
 defmodule FileSync.Boundaries.DropBox.Client do
-  alias FileSync.Boundaries.DropBox.ParseResponse
+  alias FileSync.Boundaries.DropBox.ResponseParser
 
   def list_folder(opts) do
     default_post_opts
@@ -10,12 +10,16 @@ defmodule FileSync.Boundaries.DropBox.Client do
 
   defp handle_response({:ok, response}) do
     response
-    |> ParseResponse.from_httpoison
+    |> ResponseParser.parse
     |> respond
   end
 
-  defp respond(response) do
+  defp respond(response = %{status_code: 200}) do
     {:ok, response}
+  end
+
+  defp respond(response) do
+    {:error, response.body}
   end
 
   defp default_post_opts do

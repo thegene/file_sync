@@ -8,6 +8,18 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
   context "Given a DropBox list_folder request" do
     let subject: Client.list_folder(%{folder: "foo", http: mock_http()})
 
+    let :mock_http, do:
+      HTTPoison
+      |> double
+      |> allow(:post, fn(_url, _body, _headers, _options) ->
+        {:ok, %{
+          body: response_body(),
+          headers: response_headers(),
+          status_code: response_status_code()
+        }}
+      end)
+
+
     context "which is successful" do
       let :fixtures_path, do:
         Path.join([
@@ -18,29 +30,20 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
           "list_folder_small.json"
         ])
 
-      let :headers, do:
+      let :response_body, do:
+        fixtures_path()
+        |> File.read!
+        |> Poison.decode!
+        |> Map.get("body")
+
+      let :response_headers, do:
         [
           {"Server", "nginx"},
           {"x-dropbox-request-id", "8711e060f291f386b39a3890cbce15b2"},
           {"Other stuff", "blah"}
         ]
 
-      let :mock_http, do:
-        HTTPoison
-        |> double
-        |> allow(:post, fn(_url, _body, _headers, _options) ->
-          body =
-            fixtures_path()
-            |> File.read!
-            |> Poison.decode!
-            |> Map.get("body")
-
-          {:ok, %{
-            body: body,
-            headers: headers(),
-            status_code: 200
-          }}
-        end)
+      let response_status_code: 200
 
 			it "has 200 status code" do
         {:ok, response} = subject()
@@ -64,7 +67,25 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
       end
     end
 
-    xcontext "which returns a drop box error" do
+    context "which returns a drop box error" do
+      let :response_body, do:
+        %{
+          "error_summary": "path/not_found/.",
+          "error": %{
+              ".tag": "path",
+              "path": %{".tag": "not_found"}
+          }
+        } |> Poison.encode!
+
+      let :response_headers, do:
+        [{"Content-Disposition", "attachment; filename='error'"}]
+
+      let response_status_code: 409
+
+      it "results in an error message" do
+        {:error, message} = subject()
+        expect(message).to eq("path/not_found/.")
+      end
     end
 
     xcontext "which times out" do
