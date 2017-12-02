@@ -38,6 +38,15 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
         |> expect
         |> to(eq("8711e060f291f386b39a3890cbce15b2"))
       end
+
+      it "has entries in the response body" do
+        {:ok, response} = subject()
+        response.body
+        |> Map.get(:entries)
+        |> length
+        |> expect
+        |> to(eq(21))
+      end
     end
 
     xcontext "which returns a drop box error" do
