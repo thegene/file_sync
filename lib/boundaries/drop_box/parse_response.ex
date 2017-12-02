@@ -24,6 +24,4 @@ defmodule FileSync.Boundaries.DropBox.ParseResponse do
       entries: body["entries"]
     }
   end
-
-  
 end
