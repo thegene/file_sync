@@ -41,7 +41,7 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
             "path_lower" => "/harrison birth/thumbs"
           }]
         def handle_folder("foo") do
-          {:ok, %{"entries" => folder_contents()}}
+          {:ok, %{body: %{:entries => folder_contents()}}}
         end
 
         it "parses the resulting folder contents into inventory items" do

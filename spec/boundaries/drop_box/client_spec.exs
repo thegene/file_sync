@@ -18,15 +18,28 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
           "list_folder_small.json"
         ])
 
+      let :headers, do:
+        [
+          {"Server", "nginx"},
+          {"x-dropbox-request-id", "8711e060f291f386b39a3890cbce15b2"},
+          {"Other stuff", "blah"}
+        ]
+
       let :mock_http, do:
         HTTPoison
         |> double
         |> allow(:post, fn(_url, _body, _headers, _options) ->
-          response =
+          body =
             fixtures_path()
             |> File.read!
             |> Poison.decode!
-          {:ok, response}
+            |> Map.get("body")
+
+          {:ok, %{
+            body: body,
+            headers: headers(),
+            status_code: 200
+          }}
         end)
 
 			it "has 200 status code" do

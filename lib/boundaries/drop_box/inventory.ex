@@ -1,6 +1,6 @@
 defmodule FileSync.Boundaries.DropBox.Inventory do
 
-  alias FileSync.Boundaries.DropBox.{ResponseParser, Client}
+  alias FileSync.Boundaries.DropBox.Client
 
   def get(opts = %{folder: folder}) do
     %{folder: folder}
@@ -14,7 +14,8 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
 
   defp parse({:ok, response}) do
     response
-    |> Map.get("entries")
+    |> Map.get(:body)
+    |> Map.get(:entries)
     |> cast_entries
     |> build_successful_response
   end
