@@ -11,7 +11,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
               url(endpoint),
               body(endpoint_opts),
               headers(opts),
-              %{}
+              http_options(opts)
             )
   end
 
@@ -36,4 +36,11 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
       "Content-Type": "application/json"
     ]
   end
+
+  defp http_options(_opts) do
+    [
+      timeout: 8000
+    ]
+  end
+
 end

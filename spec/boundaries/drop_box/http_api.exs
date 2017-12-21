@@ -61,6 +61,17 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
 
       end
 
+      it "sends with default http options" do
+        subject()
+
+        assert_received({
+                          :post,
+                          _,
+                          _,
+                          _,
+                          [timeout: 8000]
+                        })
+      end
     end
   end
 end
