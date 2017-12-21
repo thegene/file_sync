@@ -87,7 +87,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
 
         assert_received({
                           :post,
-                          "https://api.dropboxapi.com/2/files/download",
+                          "https://content.dropboxapi.com/2/files/download",
                           "{\"path\":\"foo.txt\"}",
                           _,
                           _
