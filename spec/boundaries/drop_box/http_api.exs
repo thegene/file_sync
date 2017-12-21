@@ -1,12 +1,14 @@
 defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.{HttpApi,ListFolderOptions}
+  alias FileSync.Boundaries.DropBox.{HttpApi,ListFolderOptions,DownloadOptions}
 
   import Double
   require IEx
 
   context "Given a post to the DropBox HTTP Api" do
+    let subject: HttpApi.post(opts())
+
     let :mock_http, do:
       HTTPoison
       |> double
@@ -15,8 +17,6 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
       end)
 
     context "when we post to the list_folder endpoint" do
-      let subject: HttpApi.post(opts())
-
       let opts: %{
         endpoint: "list_folder",
         endpoint_opts: %ListFolderOptions{folder: "foo"},
@@ -72,6 +72,28 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
                           [timeout: 8000]
                         })
       end
+    end
+
+    context "when we post to the download endpoint" do
+      let opts: %{
+        endpoint: "download",
+        endpoint_opts: %DownloadOptions{ path: "foo.txt" },
+        token: "overridden token",
+        http: mock_http()
+      }
+
+      it "posts to the download endpoint requesting the specified file path" do
+        subject()
+
+        assert_received({
+                          :post,
+                          "https://api.dropboxapi.com/2/files/download",
+                          "{\"path\":\"foo.txt\"}",
+                          _,
+                          _
+                        })
+      end
+
     end
   end
 end
