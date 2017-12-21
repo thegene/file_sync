@@ -1,8 +1,9 @@
 defmodule FileSync.Boundaries.DropBox.Client do
-  alias FileSync.Boundaries.DropBox.{ResponseParser,FolderOptions}
+  alias FileSync.Boundaries.DropBox.{ResponseParser,FolderOptions,HttpApi}
 
   def list_folder(opts) do
     opts
+    |> set_defaults
     |> post
     |> handle_response
   end
@@ -26,13 +27,17 @@ defmodule FileSync.Boundaries.DropBox.Client do
   end
 
   defp post(%{folder: folder, api: api}) do
-    api.post(
+    api.post(%{
              endpoint: "list_folder",
              endpoint_opts: endpoint_opts(folder)
-            )
+           })
   end
 
   defp endpoint_opts(folder) do
     %FolderOptions{folder: folder}
+  end
+
+  defp set_defaults(opts) do
+    %{api: HttpApi} |> Map.merge(opts)
   end
 end

@@ -11,9 +11,9 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
     let :mock_api, do:
       HttpApi
       |> double
-      |> allow(:post, fn(
+      |> allow(:post, fn(%{
                         endpoint: "list_folder",
-                        endpoint_opts: %FolderOptions{folder: "foo"} ) ->
+                        endpoint_opts: %FolderOptions{folder: "foo"}}) ->
         {:ok, %{
           body: response_body(),
           headers: response_headers(),
