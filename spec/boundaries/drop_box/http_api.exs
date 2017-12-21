@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.HttpApi
+  alias FileSync.Boundaries.DropBox.{HttpApi,FolderOptions}
 
   import Double
   require IEx
@@ -19,7 +19,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
 
       let opts: %{
         endpoint: "list_folder",
-        endpoint_opts: "SOME ENCODED FOLDER OPTIONS",
+        endpoint_opts: %FolderOptions{folder: "foo"},
         token: "overridden token",
         http: mock_http()
       }
@@ -39,7 +39,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
         assert_received({
                           :post,
                           _,
-                          "SOME ENCODED FOLDER OPTIONS",
+                          "{\"recursive\":false,\"path\":\"/foo\",\"include_mounted_folders\":true,\"include_media_info\":false,\"include_has_explicit_shared_members\":false,\"include_deleted\":false}",
                           _,
                           _
                         })
