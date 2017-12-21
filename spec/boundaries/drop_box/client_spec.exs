@@ -1,17 +1,19 @@
 defmodule FileSync.Boundaries.DropBox.ClientSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.Client
+  alias FileSync.Boundaries.DropBox.{Client,HttpApi,FolderOptions}
 
   import Double
 
   context "Given a DropBox list_folder request" do
-    let subject: Client.list_folder(%{folder: "foo", http: mock_http()})
+    let subject: Client.list_folder(%{folder: "foo", api: mock_api()})
 
-    let :mock_http, do:
-      HTTPoison
+    let :mock_api, do:
+      HttpApi
       |> double
-      |> allow(:post, fn(_url, _body, _headers, _options) ->
+      |> allow(:post, fn(
+                        endpoint: "list_folder",
+                        endpoint_opts: %FolderOptions{folder: "foo"} ) ->
         {:ok, %{
           body: response_body(),
           headers: response_headers(),
@@ -89,10 +91,10 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
     end
 
     context "which times out" do
-      let :mock_http, do:
-        HTTPoison
+      let :mock_api, do:
+        HttpApi
         |> double
-        |> allow(:post, fn(_url, _body, _headers, _options) ->
+        |> allow(:post, fn(_) ->
           {:error, %HTTPoison.Error{id: nil, reason: :connect_timeout}}
         end)
 
