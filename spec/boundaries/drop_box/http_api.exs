@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.{HttpApi,FolderOptions}
+  alias FileSync.Boundaries.DropBox.{HttpApi,ListFolderOptions}
 
   import Double
   require IEx
@@ -19,7 +19,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
 
       let opts: %{
         endpoint: "list_folder",
-        endpoint_opts: %FolderOptions{folder: "foo"},
+        endpoint_opts: %ListFolderOptions{folder: "foo"},
         token: "overridden token",
         http: mock_http()
       }
