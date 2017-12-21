@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.{HttpApi,FolderOptions}
+  alias FileSync.Boundaries.DropBox.HttpApi
 
   import Double
   require IEx
@@ -20,6 +20,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
       let opts: %{
         endpoint: "list_folder",
         endpoint_opts: "SOME ENCODED FOLDER OPTIONS",
+        token: "overridden token",
         http: mock_http()
       }
 
@@ -42,6 +43,22 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
                           _,
                           _
                         })
+      end
+
+      it "sends content type and auth headers" do
+        subject()
+
+        assert_received({
+                          :post,
+                          _,
+                          _,
+                          [
+                            "Authorization": "Bearer overridden token",
+                            "Content-Type": "application/json"
+                          ],
+                          _
+                        })
+
       end
 
     end
