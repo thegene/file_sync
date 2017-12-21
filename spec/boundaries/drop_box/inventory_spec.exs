@@ -6,8 +6,6 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
 
   import Double
 
-  require IEx
-
   context "Given a dropbox client" do
     let :client, do:
       Client
