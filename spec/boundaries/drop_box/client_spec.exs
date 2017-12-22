@@ -134,6 +134,11 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
           {:ok, %Response{body: content}} = subject()
           expect(content).to eq(response_body())
         end
+
+        it "makes available the fiel name in the headers" do
+          {:ok, %Response{headers: headers}} = subject()
+          expect(headers["file_data"]["name"]).to eq("IMG_0305.jpg")
+        end
       end
 
       context "which fails" do

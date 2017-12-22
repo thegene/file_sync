@@ -1,12 +1,10 @@
 require IEx
 
-alias FileSync.Boundaries.DropBox.HttpApi
+alias FileSync.Boundaries.DropBox.FileContents
 alias FileSync.Boundaries.DropBox.Endpoints.Download
 
-opts = %{
-  endpoint: %Download{path: "/harrison birth/img_0305.jpg"}
-}
+path =  "/harrison birth/img_0305.jpg"
 
-response = HttpApi.post(opts)
+file_data = FileContents.get(%{path: path})
 
 IEx.pry
