@@ -106,7 +106,7 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
     context "when we make a download request" do
       let subject: Client.download(%{path: "foo_bar", api: mock_api()})
 
-      context "which succeeds" do
+      context "which is successful" do
         let :response_body, do:
           [
             "spec",
@@ -133,6 +133,41 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
         it "returns a Response with binary content" do
           {:ok, %Response{body: content}} = subject()
           expect(content).to eq(response_body())
+        end
+      end
+
+      context "which fails" do
+        let :response_body, do:
+          %{
+            "error_summary": "path/not_found/.",
+            "error": %{
+                ".tag": "path",
+                "path": %{".tag": "not_found"}
+            }
+          } |> Poison.encode!
+
+        let :response_headers, do:
+          [{"Content-Disposition", "attachment; filename='error'"}]
+
+        let response_status_code: 409
+
+        it "results in an error message" do
+          {:error, message} = subject()
+          expect(message).to eq("path/not_found/.")
+        end
+      end
+
+      context "which times out" do
+        let :mock_api, do:
+          HttpApi
+          |> double
+          |> allow(:post, fn(_) ->
+            {:error, %HTTPoison.Error{id: nil, reason: :connect_timeout}}
+          end)
+
+        it "results in an error message" do
+          {:error, message} = subject()
+          expect(message).to eq("request timed out")
         end
       end
     end
