@@ -38,5 +38,9 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       |> expect
       |> to(eq([]))
     end
+
+    it "has a strategy" do
+      expect(endpoint().strategy).to eq(ListFolder)
+    end
   end
 end

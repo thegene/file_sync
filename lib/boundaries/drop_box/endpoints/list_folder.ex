@@ -7,7 +7,8 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     include_media_info: false,
     include_deleted: false,
     include_has_explicit_shared_members: false,
-    include_mounted_folders: true
+    include_mounted_folders: true,
+    strategy: ListFolder
   ]
 
   def body(%ListFolder{

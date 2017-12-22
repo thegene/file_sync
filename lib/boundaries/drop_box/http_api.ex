@@ -2,25 +2,19 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
   alias FileSync.Boundaries.DropBox.Endpoints.{ListFolder, Download}
 
   def post(opts = %{
-             endpoint: endpoint,
+             endpoint: endpoint
            }) do
 
     http = Map.get(opts, :http, HTTPoison)
 
+    strategy = endpoint.strategy
+
     http.post(
-              endpoint.url(opts),
-              endpoint.body(opts),
+              strategy.url(endpoint),
+              strategy.body(endpoint),
               headers(opts),
-              http_options(opts)
+              http_options()
             )
-  end
-
-  defp url("list_folder") do
-    "https://api.dropboxapi.com/2/files/list_folder"
-  end
-
-  defp url("download") do
-    "https://content.dropboxapi.com/2/files/download"
   end
 
   defp token_from_file do
@@ -30,14 +24,17 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
 
   defp headers(opts) do
     token = Map.get(opts, :token, token_from_file())
+    endpoint = opts.endpoint
+    strategy = endpoint.strategy
 
     [
       "Authorization": "Bearer #{token}",
       "Content-Type": "application/json"
     ]
+    |> Enum.into(strategy.headers(endpoint))
   end
 
-  defp http_options(_opts) do
+  defp http_options do
     [
       timeout: 8000
     ]

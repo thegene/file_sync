@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.Endpoints.Download do
-  defstruct [:path]
-
   alias FileSync.Boundaries.DropBox.Endpoints.Download
+
+  defstruct [:path, strategy: Download]
 
   def url(_) do
     "https://content.dropboxapi.com/2/files/download"

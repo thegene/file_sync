@@ -26,5 +26,9 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.DownloadSpec do
       |> expect
       |> to(eq("https://content.dropboxapi.com/2/files/download"))
     end
+
+    it "has a strategy" do
+      expect(endpoint().strategy).to eq(Download)
+    end
   end
 end

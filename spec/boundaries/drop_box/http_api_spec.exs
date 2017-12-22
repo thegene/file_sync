@@ -87,8 +87,12 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
         assert_received({
                           :post,
                           "https://content.dropboxapi.com/2/files/download",
-                          "{\"path\":\"foo.txt\"}",
                           _,
+                          [
+                            "Dropbox-API-Arg": "{\"path\":\"foo.txt\"}",
+                            "Authorization": "Bearer overridden token",
+                            "Content-Type": "application/json"
+                          ],
                           _
                         })
       end
