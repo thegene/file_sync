@@ -28,13 +28,10 @@ defmodule FileSync.Boundaries.DropBox.Client do
   end
 
   defp post(%{folder: folder, api: api}) do
-    api.post(%{
-             endpoint: "list_folder",
-             endpoint_opts: endpoint_opts(folder)
-           })
+    api.post(%{endpoint: endpoint(folder)})
   end
 
-  defp endpoint_opts(folder) do
+  defp endpoint(folder) do
     %ListFolder{folder: folder}
   end
 
