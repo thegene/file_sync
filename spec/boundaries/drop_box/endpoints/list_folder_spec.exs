@@ -32,11 +32,11 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       |> to(eq("https://api.dropboxapi.com/2/files/list_folder"))
     end
 
-    it "does not return any headers" do
+    it "requests JSON in the headers" do
       endpoint()
       |> ListFolder.headers
       |> expect
-      |> to(eq([]))
+      |> to(eq(["Content-Type": "application/json"]))
     end
 
     it "has a strategy" do

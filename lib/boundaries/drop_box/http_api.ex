@@ -28,8 +28,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
     strategy = endpoint.strategy
 
     [
-      "Authorization": "Bearer #{token}",
-      "Content-Type": "application/json"
+      "Authorization": "Bearer #{token}"
     ]
     |> Enum.into(strategy.headers(endpoint))
   end

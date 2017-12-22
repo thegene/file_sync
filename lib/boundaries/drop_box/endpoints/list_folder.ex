@@ -35,7 +35,7 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
   end
 
   def headers(_) do
-    []
+    ["Content-Type": "application/json"]
   end
 
   def build_endpoint(opts) do

@@ -53,8 +53,8 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
                           _,
                           _,
                           [
-                            "Authorization": "Bearer overridden token",
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer overridden token"
                           ],
                           _
                         })
@@ -90,8 +90,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
                           _,
                           [
                             "Dropbox-API-Arg": "{\"path\":\"foo.txt\"}",
-                            "Authorization": "Bearer overridden token",
-                            "Content-Type": "application/json"
+                            "Authorization": "Bearer overridden token"
                           ],
                           _
                         })
