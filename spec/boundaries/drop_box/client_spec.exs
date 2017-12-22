@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.ClientSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.{Client,HttpApi,ListFolderOptions}
+  alias FileSync.Boundaries.DropBox.{Client,HttpApi,ListFolder}
 
   import Double
 
@@ -13,7 +13,7 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
       |> double
       |> allow(:post, fn(%{
                         endpoint: "list_folder",
-                        endpoint_opts: %ListFolderOptions{folder: "foo"}}) ->
+                        endpoint_opts: %ListFolder{folder: "foo"}}) ->
         {:ok, %{
           body: response_body(),
           headers: response_headers(),

@@ -1,5 +1,5 @@
-defmodule FileSync.Boundaries.DropBox.ListFolderOptions do
-  alias FileSync.Boundaries.DropBox.ListFolderOptions
+defmodule FileSync.Boundaries.DropBox.ListFolder do
+  alias FileSync.Boundaries.DropBox.ListFolder
 
   defstruct [
     :folder,
@@ -10,7 +10,7 @@ defmodule FileSync.Boundaries.DropBox.ListFolderOptions do
     include_mounted_folders: true
   ]
 
-  def endpoint_options(%ListFolderOptions{
+  def endpoint_options(%ListFolder{
       folder: folder,
       recursive: recursive,
       include_media_info: include_media_info,
