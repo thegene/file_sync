@@ -1,5 +1,5 @@
 defmodule FileSync.Boundaries.DropBox.HttpApi do
-  alias FileSync.Boundaries.DropBox.{ListFolder, DownloadOptions}
+  alias FileSync.Boundaries.DropBox.Endpoints.{ListFolder, Download}
 
   def post(opts = %{
              endpoint: endpoint,
@@ -33,8 +33,8 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
     ListFolder.endpoint_options(endpoint_options)
   end
 
-  defp body(endpoint_options = %DownloadOptions{}) do
-    DownloadOptions.endpoint_options(endpoint_options)
+  defp body(endpoint_options = %Download{}) do
+    Download.endpoint_options(endpoint_options)
   end
 
   defp headers(opts) do

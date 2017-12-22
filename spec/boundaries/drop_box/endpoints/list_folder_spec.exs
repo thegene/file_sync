@@ -1,7 +1,7 @@
-defmodule FileSync.Boundaries.DropBox.ListFolderSpec do
+defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.ListFolder
+  alias FileSync.Boundaries.DropBox.Endpoints.ListFolder
 
   context "Given a set of options for folder api requests" do
     let options: %ListFolder{

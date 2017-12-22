@@ -1,5 +1,5 @@
-defmodule FileSync.Boundaries.DropBox.ListFolder do
-  alias FileSync.Boundaries.DropBox.ListFolder
+defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
+  alias FileSync.Boundaries.DropBox.Endpoints.ListFolder
 
   defstruct [
     :folder,

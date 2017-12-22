@@ -1,7 +1,8 @@
 defmodule FileSync.Boundaries.DropBox.ClientSpec do
   use ESpec
 
-  alias FileSync.Boundaries.DropBox.{Client,HttpApi,ListFolder}
+  alias FileSync.Boundaries.DropBox.{Client,HttpApi}
+  alias FileSync.Boundaries.DropBox.Endpoints.ListFolder
 
   import Double
 

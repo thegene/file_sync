@@ -1,10 +1,11 @@
 require IEx
 
-alias FileSync.Boundaries.DropBox.{HttpApi, DownloadOptions}
+alias FileSync.Boundaries.DropBox.HttpApi
+alias FileSync.Boundaries.DropBox.Endpoints.Download
 
 opts = %{
   endpoint: "download",
-  endpoint_opts: %DownloadOptions{path: "something"}
+  endpoint_opts: %Download{path: "something"}
 }
 
 response = HttpApi.post(opts)
