@@ -29,6 +29,14 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     |> Poison.encode!
   end
 
+  def url(_) do
+    "https://api.dropboxapi.com/2/files/list_folder"
+  end
+
+  def headers(_) do
+    []
+  end
+
   def build_endpoint(opts) do
     struct(ListFolder, opts)
   end

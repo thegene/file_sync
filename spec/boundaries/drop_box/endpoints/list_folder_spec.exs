@@ -8,10 +8,35 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       folder: "foo_bar"
     })
 
+    let :expected_payload, do:
+      %{
+        "path": "/foo_bar",
+        "recursive": false,
+        "include_media_info": false,
+        "include_deleted": false,
+        "include_has_explicit_shared_members": false,
+        "include_mounted_folders": true
+      }
+      |> Poison.encode!
+
     it "gives an encoded json representation including defaults and folder" do
-      ListFolder.body(endpoint())
+      endpoint()
+      |> ListFolder.body
       |> expect
-      |> to(eq("{\"recursive\":false,\"path\":\"/foo_bar\",\"include_mounted_folders\":true,\"include_media_info\":false,\"include_has_explicit_shared_members\":false,\"include_deleted\":false}"))
+      |> to(eq(expected_payload()))
+    end
+
+    it "knows its url" do
+      endpoint()
+      |> ListFolder.url
+      |> to(eq("https://api.dropboxapi.com/2/files/list_folder"))
+    end
+
+    it "does not return any headers" do
+      endpoint()
+      |> ListFolder.headers
+      |> expect
+      |> to(eq([]))
     end
   end
 end
