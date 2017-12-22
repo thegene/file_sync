@@ -41,7 +41,6 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
         end)
 
       it "returns a file contents data object" do
-        h = response_headers()
         {:ok, file_data} = subject()
         expect(file_data.content).to eq(response_body())
       end
