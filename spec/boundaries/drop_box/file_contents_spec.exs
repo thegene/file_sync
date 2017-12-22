@@ -30,5 +30,17 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
         expect(file_data.content).to eq(response_body())
       end
     end
+
+    context "when it fails" do
+      let :mock_client, do:
+        Client
+        |> double
+        |> allow(:download, fn(_) -> {:error, "Some error message"} end)
+
+      it "passes the error state along" do
+        {:error, message} = subject()
+        expect(message).to eq("Some error message")
+      end
+    end
   end
 end

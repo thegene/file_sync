@@ -9,4 +9,8 @@ defmodule FileSync.Boundaries.DropBox.FileContents do
   defp handle({:ok, response}) do
     {:ok, %FileData{content: response.body}}
   end
+
+  defp handle({:error, message}) do
+    {:error, message}
+  end
 end
