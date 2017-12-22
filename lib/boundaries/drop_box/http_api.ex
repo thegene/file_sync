@@ -1,5 +1,4 @@
 defmodule FileSync.Boundaries.DropBox.HttpApi do
-  alias FileSync.Boundaries.DropBox.Endpoints.{ListFolder, Download}
 
   def post(opts = %{
              endpoint: endpoint
