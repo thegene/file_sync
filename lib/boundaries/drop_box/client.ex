@@ -23,18 +23,12 @@ defmodule FileSync.Boundaries.DropBox.Client do
     {:error, "request timed out"}
   end
 
+  defp handle_response({:ok, %{status_code: 409, body: body}}, _parser) do
+    {:error, body |> Poison.decode! |> Map.get("error_summary")}
+  end
+
   defp handle_response({:ok, response}, parser) do
-    response
-    |> parser.parse
-    |> respond
-  end
-
-  defp respond(response = %{status_code: 200}) do
-    {:ok, response}
-  end
-
-  defp respond(response) do
-    {:error, response.body}
+    {:ok, response |> parser.parse }
   end
 
   defp post(%{endpoint: endpoint, api: api}) do
