@@ -35,7 +35,8 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
           |> allow(:write, fn("SOME PID", _) -> :ok end)
 
         it "returns an :ok" do
-          expect(subject()).to eq(:ok)
+          {:ok, message} = subject()
+          expect(message).to eq("Successfully wrote baz.txt")
         end
 
         it "writes to IO" do
@@ -50,7 +51,21 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
         end
       end
 
-      xcontext "when a missing file error is thrown" do
+      context "when a missing file error is thrown" do
+        let :mock_file_system, do:
+          File
+          |> double
+          |> allow(:open, fn("/foo/bar/baz.txt", _opts) -> {:error, :enoent} end)
+
+        let :mock_io, do:
+          IO
+          |> double
+          |> allow(:write, fn(_, _) -> :ok end)
+
+        it "does not attempt to write the file" do
+          subject()
+          assert_received({:write, _, _})
+        end
       end
     end
   end
