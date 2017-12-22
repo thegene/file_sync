@@ -36,11 +36,13 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
   defp cast_single_entry(%{
                            ".tag" => "file",
                            "name" => name,
-                           "size" => size
+                           "size" => size,
+                           "path_lower" => path
                          }) do
     %FileSync.Data.InventoryItem {
       name: name,
-      size: size
+      size: size,
+      path: path
     }
   end
 
