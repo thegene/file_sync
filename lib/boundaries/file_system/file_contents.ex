@@ -19,15 +19,15 @@ defmodule FileSync.Boundaries.FileSystem.FileContents do
     {io.write(file, file_data.content), file}
   end
 
-  defp write_to_file(response = {:error, :enoent}, _io, _file_data) do
-    response
+  defp write_to_file({:error, reason}, _io, _file_data) do
+    {:error, reason}
   end
 
   defp close_file({:ok, file}, file_system) do
     file_system.close(file)
   end
 
-  defp close_file({:error, :enoent}, _file_system) do
+  defp close_file({:error, _}, _file_system) do
     :error
   end
 

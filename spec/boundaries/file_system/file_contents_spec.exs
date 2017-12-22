@@ -60,11 +60,11 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
         let :mock_io, do:
           IO
           |> double
-          |> allow(:write, fn(_, _) -> :ok end)
+          |> allow(:write, fn(_, _) -> raise "shouldn't ever hit" end)
 
         it "does not attempt to write the file" do
           subject()
-          assert_received({:write, _, _})
+          refute_received({:write, :enoent, _})
         end
       end
     end
