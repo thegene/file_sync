@@ -10,7 +10,7 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     include_mounted_folders: true
   ]
 
-  def endpoint_options(%ListFolder{
+  def body(%ListFolder{
       folder: folder,
       recursive: recursive,
       include_media_info: include_media_info,
@@ -27,5 +27,9 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
       "include_mounted_folders": include_mounted_folders
     }
     |> Poison.encode!
+  end
+
+  def build_endpoint(opts) do
+    struct(ListFolder, opts)
   end
 end

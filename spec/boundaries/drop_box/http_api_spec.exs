@@ -19,8 +19,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
 
     context "when we post to the list_folder endpoint" do
       let opts: %{
-        endpoint: "list_folder",
-        endpoint_opts: %ListFolder{folder: "foo"},
+        endpoint: %ListFolder{folder: "foo"},
         token: "overridden token",
         http: mock_http()
       }
@@ -77,8 +76,7 @@ defmodule FileSync.Boundaries.DropBox.HttpApiSpec do
 
     context "when we post to the download endpoint" do
       let opts: %{
-        endpoint: "download",
-        endpoint_opts: %Download{ path: "foo.txt" },
+        endpoint: %Download{ path: "foo.txt" },
         token: "overridden token",
         http: mock_http()
       }
