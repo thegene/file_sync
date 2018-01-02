@@ -2,8 +2,8 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
 
   alias FileSync.Boundaries.DropBox.Client
 
-  def get(opts = %{folder: folder}) do
-    %{folder: folder}
+  def get(opts) do
+    opts
     |> find_client(opts).list_folder
     |> parse
   end
