@@ -16,7 +16,7 @@ defmodule FileSync.Boundaries.FileSystem.FileContents do
   end
 
   defp write_to_file({:ok, file}, io, file_data) do
-    {io.write(file, file_data.content), file}
+    {io.binwrite(file, file_data.content), file}
   end
 
   defp write_to_file({:error, reason}, _io, _file_data) do

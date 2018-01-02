@@ -32,7 +32,7 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
         let :mock_io, do:
           IO
           |> double
-          |> allow(:write, fn("SOME PID", _) -> :ok end)
+          |> allow(:binwrite, fn("SOME PID", _) -> :ok end)
 
         it "returns an :ok" do
           {:ok, message} = subject()
@@ -41,7 +41,7 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
 
         it "writes to IO" do
           subject()
-          assert_received({:write, "SOME PID", 'some binary data'})
+          assert_received({:binwrite, "SOME PID", 'some binary data'})
         end
 
         it "opens and closes the file" do
