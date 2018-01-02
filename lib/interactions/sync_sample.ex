@@ -9,6 +9,10 @@ defmodule FileSync.Interactions.SyncSample do
     |> sync_inventory(opts)
   end
 
+  defp sync_inventory({:error, message}, _opts) do
+    raise "Failed to get inventory: #{message}"
+  end
+
   defp sync_inventory({:ok, response}, opts) do
     response
     |> Map.get(:items)
