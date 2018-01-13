@@ -1,4 +1,4 @@
-defmodule FileSync.Interactions.SyncSample do
+defmodule FileSync.Interactions.SyncSingleBatch do
   require IEx
 
   def sync(opts = %{from: from, from_opts: from_opts}) do
@@ -25,7 +25,7 @@ defmodule FileSync.Interactions.SyncSample do
   end
 
   defp sync_items(items, opts) do
-    Enum.each(items, fn(item) -> sync_item(item, opts) end)
+    Enum.each(items, fn(item) -> spawn fn -> sync_item(item, opts) end end)
   end
 
   defp sync_item({:ok, data}, %{to: to, to_opts: to_opts}) do

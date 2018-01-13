@@ -1,13 +1,18 @@
 defmodule FileSync.Boundaries.DropBox.FileContents do
 
-  alias FileSync.Data.FileData
+  alias FileSync.Data.{FileData,InventoryItem,InventoryFolder}
   alias FileSync.Boundaries.DropBox.Client
 
-  def get(opts = %{path: path}) do
+  def get(item, opts \\ %{})
+  def get(%InventoryItem{path: path}, opts) do
 
     client = Map.get(opts, :client, Client)
 
     client.download(%{path: path}) |> handle
+  end
+
+  def get(_item = %InventoryFolder{}, _opts) do
+    # folder traversal not yet implemented
   end
 
   defp handle({:ok, response}) do

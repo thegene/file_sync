@@ -2,11 +2,13 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
   use ESpec
 
   alias FileSync.Boundaries.DropBox.{FileContents,Client,Response}
+  alias FileSync.Data.InventoryItem
 
   import Double
 
   context "Given a request for file contents of a path" do
-    let subject: FileContents.get(%{path: "foo.txt", client: mock_client()})
+    let item: %InventoryItem{path: "foo.txt"}
+    let subject: FileContents.get(item(), %{client: mock_client()})
 
     context "when successful" do
       let :response_body, do:
