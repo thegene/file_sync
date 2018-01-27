@@ -6,7 +6,7 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
 
   import Double
 
-  context "Given a request for file contents of a path" do
+  context "Given a request for file contents of an InventoryItem" do
     let item: %InventoryItem{path: "foo.txt"}
     let subject: FileContents.get(item(), %{client: mock_client()})
 
