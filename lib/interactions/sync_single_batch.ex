@@ -37,7 +37,7 @@ defmodule FileSync.Interactions.SyncSingleBatch do
   end
 
   defp sync_item({:ok, data}, %{to: to, to_opts: to_opts}) do
-    destination = to.file_contents
+    destination = to.file_contents()
 
     data |> destination.put(to_opts)
   end
