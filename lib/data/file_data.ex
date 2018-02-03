@@ -1,3 +1,3 @@
 defmodule FileSync.Data.FileData do
-  defstruct [:content, :name]
+  defstruct [:content, :name, :size]
 end

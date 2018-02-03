@@ -42,16 +42,22 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
           {:ok, %Response{body: response_body(), headers: response_headers()}}
         end)
 
-      it "returns a file contents data object" do
+      before do
         {:ok, file_data} = subject()
-        expect(file_data.content).to eq(response_body())
+        {:shared, %{file_data: file_data}}
+      end
+
+      it "returns a file contents data object" do
+        expect(shared.file_data.content).to eq(response_body())
       end
 
       it "returns a file with the name supplied in the headers" do
-        {:ok, file_data} = subject()
-        expect(file_data.name).to eq("IMG_0305.jpg")
+        expect(shared.file_data.name).to eq("IMG_0305.jpg")
       end
 
+      it "sets the size of the file" do
+        expect(shared.file_data.size).to eq(8970555)
+      end
     end
 
     context "when it fails" do

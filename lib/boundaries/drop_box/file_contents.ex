@@ -16,9 +16,12 @@ defmodule FileSync.Boundaries.DropBox.FileContents do
   end
 
   defp handle({:ok, response}) do
-    {:ok, %FileData{
-      content: response.body,
-      name: response.headers["file_data"]["name"]}
+    {:ok, %FileData
+      {
+        content: response.body,
+        name: response.headers["file_data"]["name"],
+        size: response.headers["file_data"]["size"]
+      }
     }
   end
 
