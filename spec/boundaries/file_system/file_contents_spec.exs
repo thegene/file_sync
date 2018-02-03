@@ -62,9 +62,9 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
           |> double
           |> allow(:write, fn(_, _) -> raise "shouldn't ever hit" end)
 
-        it "does not attempt to write the file" do
-          subject()
-          refute_received({:write, :enoent, _})
+        it "returns the error so caller can do something with it" do
+          {:error, message} = subject()
+          expect(message).to eq("Could not write baz.txt: #{:enoent}")
         end
       end
     end

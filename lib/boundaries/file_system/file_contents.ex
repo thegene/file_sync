@@ -28,15 +28,15 @@ defmodule FileSync.Boundaries.FileSystem.FileContents do
     file_system.close(file)
   end
 
-  defp close_file({:error, _}, _file_system) do
-    :error
+  defp close_file({:error, message}, _file_system) do
+    {:error, message}
   end
 
   defp respond(:ok, file_data) do
     {:ok, "Successfully wrote #{file_data.name}"}
   end
 
-  defp respond(:error, file_data) do
-    {:error, "Could not write #{file_data.name}"}
+  defp respond({:error, message}, file_data) do
+    {:error, "Could not write #{file_data.name}: #{message}"}
   end
 end
