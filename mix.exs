@@ -23,7 +23,7 @@ defmodule FileSync.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:espec, "~> 1.4.6", only: :test},
+      {:espec, "~> 1.5.0", only: :test},
       {:double, "~> 0.6.2", only: :test},
       {:httpoison, "~> 0.13"},
       {:poison, "~> 3.1"}

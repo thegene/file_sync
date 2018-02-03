@@ -1,15 +1,20 @@
 require IEx
 
-alias FileSync.Interactions.SyncSingleBatch
+alias FileSync.Interactions
 
-SyncSingleBatch.sync(%{
-  from: FileSync.Boundaries.DropBox,
-  from_opts: %{
+from = %Interactions.Source{
+  module: %FileSync.Boundaries.DropBox{},
+  opts: %{
     folder: "Harrison Birth",
     limit: 30
-  },
-  to: FileSync.Boundaries.FileSystem,
-  to_opts: %{
+  }
+}
+
+to = %Interactions.Source{
+  module: %FileSync.Boundaries.FileSystem{},
+  opts: %{
     directory: "data"
   }
-})
+}
+
+Interactions.SyncSingleBatch.sync(from: from, to: to)

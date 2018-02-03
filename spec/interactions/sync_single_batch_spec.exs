@@ -4,29 +4,26 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
   import Double
 
   alias FileSync.Interactions.SyncSingleBatch
+  alias FileSync.Interactions.Source
   alias FileSync.Boundaries.DropBox
   alias FileSync.Boundaries.FileSystem
-  alias FileSync.Data.InventoryItem
+  alias FileSync.Data.{InventoryItem,FileData}
 
-  context "Given we are syncing an inventory from one inventory to another" do
-    let subject: SyncSingleBatch.sync(opts())
-    let opts: %{
-      from: drop_box(),
-      from_opts: from_opts(),
-      to_opts: to_opts(),
-      to: fs()
-    }
+  context "Given two sources" do
+    let subject: SyncSingleBatch.sync(from: from(), to: to())
 
-    let inventory_item: %InventoryItem{}
-    let db_response: {:ok, %{items: [inventory_item()]}}
-    let from_opts: %{}
-    let to_opts: %{}
+    let from: %Source{ module: drop_box(), opts: from_opts() }
+    let to: %Source{ module: fs(), opts: to_opts() }
+
+    let db_response: {:ok, %{items: [%InventoryItem{}]}}
+    let from_opts: %{foo: "from"}
+    let to_opts: %{foo: "to opts"}
 
     let :drop_box, do:
-      DropBox
-      |> double
-      |> allow(:inventory, fn() -> db_inventory() end)
-      |> allow(:file_contents, fn() -> db_contents() end)
+      %DropBox{
+        inventory: db_inventory(),
+        file_contents: db_contents()
+      }
 
     let :db_inventory, do:
       DropBox.Inventory
@@ -36,20 +33,34 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
     let :db_contents, do:
       DropBox.FileContents
       |> double
-      |> allow(:get, fn(_inventory_item) -> {:ok, %{}} end)
+      |> allow(:get, fn(_inventory_item) -> {:ok, %FileData{}} end)
+
+    let :fs, do:
+      %FileSystem{
+        file_contents: fs_file_contents()
+      }
 
     let :fs_file_contents, do:
       FileSystem.FileContents
       |> double
       |> allow(:put, fn(_item, _to_opts) -> end)
 
-    let! :fs, do:
-      FileSystem
-      |> double
-      |> allow(:file_contents, fn() -> fs_file_contents() end)
+    context "when we sync from one to the other" do
+      before do
+        subject()
+      end
 
-    it "calls #get on the from source" do
-      subject()
+      it "gets the from inventory" do
+        assert_received({:get, %{foo: "from"}})
+      end
+
+      it "gets an InventoryItem from the from source" do
+        assert_received({:get, %InventoryItem{}})
+      end
+
+      it "puts the FileData into the to file contents" do
+        assert_received({:put, %FileData{}, %{foo: "to opts"}})
+      end
     end
   end
 end
