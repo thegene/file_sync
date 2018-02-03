@@ -6,7 +6,7 @@ from = %Interactions.Source{
   module: %FileSync.Boundaries.DropBox{},
   opts: %{
     folder: "Harrison Birth",
-    limit: 3
+    limit: 30
   }
 }
 

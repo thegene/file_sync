@@ -13,7 +13,7 @@ defmodule FileSync.Interactions.SyncSingleBatch do
   defp is_item?(%InventoryFolder{}), do: false
 
   defp items_only(inventory) do
-    Enum.filter(inventory, fn(item) -> is_item?(item) end)
+    Stream.filter(inventory, fn(item) -> is_item?(item) end)
   end
 
   defp sync_inventory({:error, message}, _from, _to) do
@@ -29,7 +29,7 @@ defmodule FileSync.Interactions.SyncSingleBatch do
   end
 
   defp get_contents(items, from) do
-    Enum.map(items, fn(item) -> from.module.file_contents.get(item) end)
+    Stream.map(items, fn(item) -> from.module.file_contents.get(item) end)
   end
 
   defp sync_items(items, to) do
