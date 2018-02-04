@@ -20,6 +20,7 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
       Logger
       |> double
       |> allow(:error, fn(_) -> nil end)
+      |> allow(:info, fn(_) -> nil end)
 
     let db_response: {:ok, %{items: [%InventoryItem{}]}}
     let from_opts: %{foo: "from"}
@@ -49,7 +50,7 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
       let :fs_file_contents, do:
         FileSystem.FileContents
         |> double
-        |> allow(:put, fn(_item, _to_opts) -> nil end)
+        |> allow(:put, fn(_item, _to_opts) -> {:ok, "Successful"} end)
 
       let :db_inventory, do:
         DropBox.Inventory
@@ -66,6 +67,10 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
 
       it "puts the FileData into the to file contents" do
         assert_received({:put, %FileData{}, %{foo: "to opts"}})
+      end
+
+      it "logs the success" do
+        assert_received({:info, "Successful"})
       end
     end
 

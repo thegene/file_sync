@@ -51,8 +51,8 @@ defmodule FileSync.Interactions.SyncSingleBatch do
 
   defp handle_put_response(response, opts) do
     case response do
-      {:ok, message} -> opts.logger.info(response)
-      {_, message} -> opts.logger.error(message)
+      {:ok, message} -> opts.logger.info(message)
+      {:error, message} -> opts.logger.error(message)
     end
   end
 end
