@@ -1,13 +1,25 @@
 defmodule FileSync.Interactions.SyncSingleBatch do
+
+  alias FileSync.Interactions.SyncItem
   alias FileSync.Data.{InventoryItem,InventoryFolder}
+
   require IEx
 
   def sync(from: from, to: to, opts: opts) do
     inventory = from.module.inventory
+    opts_with_default = opts |> merge_default_opts
 
     from.opts
     |> inventory.get
-    |> sync_inventory(from, to, opts)
+    |> sync_inventory(from, to, opts_with_default)
+  end
+
+  defp merge_default_opts(opts) do
+    %{
+      logger: Logger,
+      sync_module: SyncItem
+    }
+    |> Map.merge(opts)
   end
 
   defp is_item?(%InventoryItem{}), do: true
@@ -34,14 +46,12 @@ defmodule FileSync.Interactions.SyncSingleBatch do
   end
 
   defp sync_items(items, to, opts) do
-    Enum.each(items, fn(item) -> spawn fn -> sync_item(item, to, opts) end end)
+    Enum.each(items, fn(item) -> sync_item(item, to, opts) end)
   end
 
   defp sync_item({:ok, data}, to, opts) do
-    destination = to.module.file_contents
-
     data
-    |> destination.put(to.opts)
+    |> opts.sync_module.sync(to)
     |> handle_put_response(opts)
   end
 

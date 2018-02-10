@@ -3,8 +3,7 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
 
   import Double
 
-  alias FileSync.Interactions.SyncSingleBatch
-  alias FileSync.Interactions.Source
+  alias FileSync.Interactions.{SyncSingleBatch,Source,SyncItem}
   alias FileSync.Boundaries.DropBox
   alias FileSync.Boundaries.FileSystem
   alias FileSync.Data.{InventoryItem,FileData}
@@ -13,8 +12,9 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
     let subject: SyncSingleBatch.sync(from: from(), to: to(), opts: opts())
 
     let from: %Source{ module: drop_box(), opts: from_opts() }
-    let to: %Source{ module: fs(), opts: to_opts() }
-    let opts: %{logger: logger()}
+    let to: %Source{}
+
+    let opts: %{logger: logger(), sync_module: sync_module()}
 
     let :logger, do:
       Logger
@@ -24,7 +24,6 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
 
     let db_response: {:ok, %{items: [%InventoryItem{}]}}
     let from_opts: %{foo: "from"}
-    let to_opts: %{foo: "to opts"}
 
     let :drop_box, do:
       %DropBox{
@@ -37,25 +36,20 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
       |> double
       |> allow(:get, fn(_inventory_item) -> {:ok, %FileData{}} end)
 
-    let :fs, do:
-      %FileSystem{
-        file_contents: fs_file_contents()
-      }
-
     context "when we successfully sync from one to the other" do
       before do
         subject()
       end
 
-      let :fs_file_contents, do:
-        FileSystem.FileContents
-        |> double
-        |> allow(:put, fn(_item, _to_opts) -> {:ok, "Successful"} end)
-
       let :db_inventory, do:
         DropBox.Inventory
         |> double
         |> allow(:get, fn(_from_opts) -> db_response() end)
+
+      let :sync_module, do:
+        SyncItem
+        |> double
+        |> allow(:sync, fn(_res, _source) -> {:ok, "Successful"} end)
 
       it "gets the from inventory" do
         assert_received({:get, %{foo: "from"}})
@@ -63,10 +57,6 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
 
       it "gets an InventoryItem from the from source" do
         assert_received({:get, %InventoryItem{}})
-      end
-
-      it "puts the FileData into the to file contents" do
-        assert_received({:put, %FileData{}, %{foo: "to opts"}})
       end
 
       it "logs the success" do
@@ -79,18 +69,18 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
         subject()
       end
 
-      let :fs_file_contents, do:
-        FileSystem.FileContents
-        |> double
-        |> allow(:put, fn(_item, _to_opts) -> {:error, "some failure"} end)
-
       let :db_inventory, do:
         DropBox.Inventory
         |> double
         |> allow(:get, fn(_from_opts) -> db_response() end)
 
+      let :sync_module, do:
+        SyncItem
+        |> double
+        |> allow(:sync, fn(_res, _source) -> {:error, "some failure"} end)
+
       it "logs an error" do
-        assert_received({:error, "Could not put file data: some failure"})
+        assert_received({:error, "some failure"})
       end
     end
 
@@ -98,6 +88,8 @@ defmodule FileSync.Interactions.SyncSingleBatchSpec do
       before do
         subject()
       end
+
+      let sync_module: SyncItem
 
       let :db_inventory, do:
         DropBox.Inventory
