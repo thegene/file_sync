@@ -1,7 +1,7 @@
-defmodule FileSync.Interactions.CreateQueueFromInventorySpec do
+defmodule FileSync.Interactions.InventoryQueueSpec do
   use ESpec
 
-  alias FileSync.Interactions.{Queue,CreateQueueFromInventory}
+  alias FileSync.Interactions.{Queue,InventoryQueue}
   alias FileSync.Data.{InventoryFolder,InventoryItem}
 
   context "Given a queue and a successful inventory response" do
@@ -23,7 +23,7 @@ defmodule FileSync.Interactions.CreateQueueFromInventorySpec do
 
     context "when we add to the queue" do
       before do
-        inventory_response() |> CreateQueueFromInventory.push_to_queue(queue())
+        inventory_response() |> InventoryQueue.push_to_queue(queue())
       end
 
       let :inventory_item do

@@ -1,4 +1,4 @@
-defmodule FileSync.Interactions.CreateQueueFromInventory do
+defmodule FileSync.Interactions.InventoryQueue do
 
   alias FileSync.Interactions.Queue
   alias FileSync.Data.InventoryItem
