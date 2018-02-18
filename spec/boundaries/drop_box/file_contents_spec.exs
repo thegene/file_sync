@@ -58,6 +58,10 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
       it "sets the size of the file" do
         expect(shared.file_data.size).to eq(8970555)
       end
+
+      context "when the contents body does not match content_hash" do
+        it "returns an error", [pending: true], do: "pending"
+      end
     end
 
     context "when it fails" do
