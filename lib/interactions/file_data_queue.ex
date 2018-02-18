@@ -1,20 +1,22 @@
 defmodule FileSync.Interactions.FileDataQueue do
 
   alias FileSync.Interactions.Queue
-  alias FileSync.Data.FileData
 
   def process_to(inventory_queue, file_data_queue, inventory) do
-    inventory_queue
-    |> Queue.pop
+    item = inventory_queue |> Queue.pop
+
+    item
     |> inventory.get
-    |> process_inventory_item(file_data_queue)
+    |> handle_item(file_data_queue, inventory_queue, item)
   end
 
-  defp process_inventory_item(data = %FileData{}, file_data_queue) do
-    file_data_queue
-    |> Queue.push(data)
+  defp handle_item({:ok, data}, data_queue, _inventory_queue, _item) do
+    data_queue |> Queue.push(data)
+    {:ok, "Successfully queued #{data.name}"}
   end
 
-  defp process_inventory_item(_data, _file_data_queue) do
+  defp handle_item(response, _data_queue, inventory_queue, item) do
+    inventory_queue |> Queue.push(item)
+    response
   end
 end

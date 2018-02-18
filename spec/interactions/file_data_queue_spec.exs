@@ -44,16 +44,16 @@ defmodule FileSync.Interactions.FileDataQueueSpec do
         |> Queue.push(%InventoryItem{path: "foo"})
       end
 
+      let! :response do
+        inventory_queue()
+        |> FileDataQueue.process_to(file_data_queue(), inventory())
+      end
+
       context "and the inventory gets data successfully" do
         let :inventory do
           FileContents
           |> double
-          |> allow(:get, fn(_item) -> %FileData{name: "foo"} end)
-        end
-
-        before do
-          inventory_queue()
-          |> FileDataQueue.process_to(file_data_queue(), inventory())
+          |> allow(:get, fn(_item) -> {:ok, %FileData{name: "foo"}} end)
         end
 
         it "now has this item on the file data queue" do
@@ -61,6 +61,49 @@ defmodule FileSync.Interactions.FileDataQueueSpec do
           |> Queue.pop
           |> expect
           |> to(eq(%FileData{name: "foo"}))
+        end
+
+        it "now has an empty inventory queue" do
+          inventory_queue()
+          |> Queue.empty?
+          |> expect
+          |> to(be_true())
+        end
+
+        it "returns an :ok message" do
+          {:ok, message} = response()
+          message
+          |> expect
+          |> to(eq("Successfully queued foo"))
+        end
+      end
+
+      context "and the inventory fails to get data successfully" do
+        let :inventory do
+          FileContents
+          |> double
+          |> allow(:get, fn(_item) -> {:error, "something borked"} end)
+        end
+
+        it "still has an empty file data queue" do
+          file_data_queue()
+          |> Queue.pop
+          |> expect
+          |> to(be_nil())
+        end
+
+        it "still has the original inventory item on the inventory queue" do
+          inventory_queue()
+          |> Queue.pop
+          |> expect
+          |> to(eq(%InventoryItem{path: "foo"}))
+        end
+
+        it "returns an error message" do
+          {:error, message} = response()
+          message
+          |> expect
+          |> to(eq("something borked"))
         end
       end
     end
