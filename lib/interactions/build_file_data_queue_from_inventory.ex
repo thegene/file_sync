@@ -1,4 +1,4 @@
-defmodule FileSync.Interactions.FileDataQueue do
+defmodule FileSync.Interactions.BuildFileDataQueue do
 
   alias FileSync.Interactions.Queue
 

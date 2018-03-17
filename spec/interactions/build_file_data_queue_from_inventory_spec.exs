@@ -1,9 +1,9 @@
-defmodule FileSync.Interactions.FileDataQueueSpec do
+defmodule FileSync.Interactions.BuildFileDataQueueSpec do
   use ESpec
 
   import Double
 
-  alias FileSync.Interactions.{FileDataQueue,Queue}
+  alias FileSync.Interactions.{BuildFileDataQueue,Queue}
   alias FileSync.Data.{InventoryItem,FileData}
   alias FileSync.Boundaries.DropBox.FileContents
 
@@ -27,7 +27,7 @@ defmodule FileSync.Interactions.FileDataQueueSpec do
 
       before do
         inventory_queue()
-        |> FileDataQueue.process_to(file_data_queue(), inventory())
+        |> BuildFileDataQueue.process_to(file_data_queue(), inventory())
       end
 
       it "still has an empty data queue" do
@@ -46,7 +46,7 @@ defmodule FileSync.Interactions.FileDataQueueSpec do
 
       let! :response do
         inventory_queue()
-        |> FileDataQueue.process_to(file_data_queue(), inventory())
+        |> BuildFileDataQueue.process_to(file_data_queue(), inventory())
       end
 
       context "and the inventory gets data successfully" do
