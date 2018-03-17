@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.FileContents do
 
   alias FileSync.Data.{FileData,InventoryItem,InventoryFolder}
-  alias FileSync.Boundaries.DropBox.Client
+  alias FileSync.Boundaries.DropBox.{Client,SourceMeta}
 
   def get(item, opts \\ %{})
   def get(%InventoryItem{path: path}, opts) do
@@ -20,12 +20,19 @@ defmodule FileSync.Boundaries.DropBox.FileContents do
       {
         content: response.body,
         name: response.headers["file_data"]["name"],
-        size: response.headers["file_data"]["size"]
+        size: response.headers["file_data"]["size"],
+        source_meta: source_meta(response)
       }
     }
   end
 
   defp handle({:error, message}) do
     {:error, message}
+  end
+
+  defp source_meta(response) do
+    %SourceMeta{
+      content_hash: response.headers["file_data"]["content_hash"]
+    }
   end
 end
