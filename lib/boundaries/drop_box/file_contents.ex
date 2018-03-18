@@ -35,7 +35,7 @@ defmodule FileSync.Boundaries.DropBox.FileContents do
     validate(res, next_validators)
   end
 
-  defp validate(res = {:error, message}, _validators) do
+  defp validate(res = {:error, _message}, _validators) do
     res
   end
 
