@@ -6,26 +6,45 @@ defmodule FileSync.Boundaries.DropBox.ContentHashValidator do
 
   def valid?(data = %FileData{
                        content: content,
-                       name: name,
                        source_meta: %SourceMeta{content_hash: hash}}) do
-    chunks = content
-    |> get_chunks
+    content
+    |> content_chunk
+    |> build_hashes
+    |> Enum.join
+    |> make_combined_hash
+    |> assert_match(hash, data)
   end
 
-  defp get_chunks(content) do
-    chunks = get_next_chunk(content)
-    IEx.pry
+  defp assert_match(subject, expected, file_data) do
+    if subject == expected do
+      {:ok, file_data}
+    else
+      {:error, "#{file_data.name} failed dropbox content hash comparison"}
+    end
   end
 
-  defp get_next_chunk(content, start \\ 0, memo \\ [])
-  defp get_next_chunk(content, start, memo) when byte_size(content) <= start + 4194304 do
+  defp make_combined_hash(big_hash) do
+    :crypto.hash(:sha256, big_hash)
+    |> Base.encode16
+    |> String.downcase
+  end
+
+  defp build_hashes(chunks) do
+    chunks
+    |> Enum.map(fn(chunk) ->
+      :crypto.hash(:sha256, chunk)
+    end)
+  end
+
+  defp content_chunk(content, start \\ 0, memo \\ [])
+  defp content_chunk(content, start, memo) when byte_size(content) <= start + 4194304 do
     len = byte_size(content) - start
     memo ++ [content |> binary_part(start, len)]
   end
 
-  defp get_next_chunk(content, start, memo) do
+  defp content_chunk(content, start, memo) do
     new_memo = memo ++ [content |> binary_part(start, 4194304)]
 
-    content |> get_next_chunk(start + 4194304, new_memo)
+    content |> content_chunk(start + 4194304, new_memo)
   end
 end

@@ -39,8 +39,7 @@ defmodule FileSync.Boundaries.DropBox.ContentHashValidatorSpec do
 
       it "returns :error along with an error message" do
         {:error, message} = subject()
-        expect(message).to eq("harrison_birth.jpg failed dropbox content hash \
-          comparison")
+        expect(message).to eq("harrison_birth.jpg failed dropbox content hash comparison")
       end
     end
   end
