@@ -5,11 +5,12 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
 
   alias FileSync.Interactions.{BuildFileDataQueue,Queue}
   alias FileSync.Data.{InventoryItem,FileData}
-  alias FileSync.Boundaries.DropBox.FileContents
+  alias FileSync.Boundaries.DropBox.{FileContents,ContentHashValidator}
 
   context "Given a queue with InventoryItems and an empty file data queue" do
     let inventory_queue: Queue.start_link([]) |> elem(1)
     let file_data_queue: Queue.start_link([]) |> elem(1)
+    let validators: []
 
     it "for sanity starts with an empty file data queue" do
       file_data_queue()
@@ -27,7 +28,7 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
 
       before do
         inventory_queue()
-        |> BuildFileDataQueue.process_to(file_data_queue(), contents())
+        |> BuildFileDataQueue.process_to(file_data_queue(), contents(), validators())
       end
 
       it "still has an empty data queue" do
@@ -46,7 +47,7 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
 
       let! :response do
         inventory_queue()
-        |> BuildFileDataQueue.process_to(file_data_queue(), contents())
+        |> BuildFileDataQueue.process_to(file_data_queue(), contents(), validators())
       end
 
       context "and the inventory gets data successfully" do
@@ -75,6 +76,73 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
           message
           |> expect
           |> to(eq("Successfully queued foo"))
+        end
+
+        context "but a validator finds the contents to be invalid" do
+          let :validator do
+            ContentHashValidator
+            |> double
+            |> allow(:valid?, fn(_item = %FileData{}) ->
+                 {:error, "file contents not valid"}
+            end )
+          end
+
+          let validators: [validator()]
+
+          it "still has an empty file data queue" do
+            file_data_queue()
+            |> Queue.pop
+            |> expect
+            |> to(be_nil())
+          end
+
+          it "still has the original inventory item on the inventory queue" do
+            inventory_queue()
+            |> Queue.pop
+            |> expect
+            |> to(eq(%InventoryItem{path: "foo"}))
+          end
+
+          it "returns an error message" do
+            {:error, message} = response()
+            message
+            |> expect
+            |> to(eq("file contents not valid"))
+          end
+        end
+
+        context "and the validator finds the contents to be valid" do
+          let :validator do
+            ContentHashValidator
+            |> double
+            |> allow(:valid?, fn(item = %FileData{}) ->
+                  {:ok, item}
+            end )
+          end
+
+          let validators: [validator()]
+
+
+          it "now has this item on the file data queue" do
+            file_data_queue()
+            |> Queue.pop
+            |> expect
+            |> to(eq(%FileData{name: "foo"}))
+          end
+
+          it "now has an empty inventory queue" do
+            inventory_queue()
+            |> Queue.empty?
+            |> expect
+            |> to(be_true())
+          end
+
+          it "returns an :ok message" do
+            {:ok, message} = response()
+            message
+            |> expect
+            |> to(eq("Successfully queued foo"))
+          end
         end
       end
 
