@@ -1,6 +1,6 @@
 defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
 
-  alias FileSync.Actions.Queue
+  alias FileSync.Actions.{Queue,Validator}
   alias FileSync.Data.InventoryItem
 
   def process(inventory_queue, content_queue, source, opts \\ %{}) do
@@ -8,11 +8,16 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
 
     item
     |> get_data(source, opts)
+    |> validate(source.validators)
     |> enqueue(inventory_queue, content_queue, item, opts)
   end
 
   defp get_data(item = %InventoryItem{}, source, opts) do
     item |> source.contents.get(opts)
+  end
+
+  defp validate(message, validators) do
+    message |> Validator.validate_with(validators)
   end
 
   defp enqueue({:ok, file_data}, _inventory_queue, content_queue, _original_item, opts) do

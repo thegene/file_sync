@@ -8,15 +8,15 @@ defmodule FileSync.Actions.Validator do
     message
   end
 
-  defp validate({:ok, data}, validators) do
+  defp validate(message = {:ok, _data}, validators) do
     [validator | rest] = validators
 
-    data
+    message
     |> validator.valid?
     |> validate(rest)
   end
 
-  defp validate(message, _validators) do
-    message
+  defp validate(res = {:error, message}, _validators) do
+    res
   end
 end

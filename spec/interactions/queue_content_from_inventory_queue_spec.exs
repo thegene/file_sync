@@ -77,6 +77,33 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
             assert_received({:info, "successfully enqueued content for FooFile.png"})
           end
         end
+
+        context "when validators fail" do
+          let :validator do
+            DropBox.ContentHashValidator
+            |> double
+            |> allow(:valid?, fn(_res) -> {:error, "validation failed"} end)
+          end
+
+          it "does not add anything to filedata queue" do
+            content_queue()
+            |> Queue.empty?
+            |> expect
+            |> to(eq(true))
+          end
+
+          it "pushes original item back onto inventory queue" do
+            inventory_queue()
+            |> Queue.pop
+            |> expect
+            |> to(eq(item()))
+          end
+
+          it "logs a validation error" do
+            assert_received({:error,
+              "failed getting FooFile.png, will retry: validation failed"})
+          end
+        end
       end
 
       context "when getting contents fails" do
