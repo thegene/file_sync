@@ -51,7 +51,11 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
         let :file_contents do
           DropBox.FileContents
           |> double
-          |> allow(:get, fn(_data) -> {:ok, %FileData{}} end)
+          |> allow(:get, fn(_data, _opts) -> {:ok, file_data()} end)
+        end
+
+        let :file_data do
+          %FileData{name: "FooFile.png"}
         end
 
         context "when validators pass" do
@@ -63,8 +67,12 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
 
           it "adds filedata to the content queue" do
             content_queue()
-            |> Queue.empty?
-            |> to(eq(false))
+            |> Queue.pop
+            |> to(eq(file_data()))
+          end
+
+          it "logs a successful enqueue" do
+            assert_received({:info, "successfully enqueued content for FooFile.png"})
           end
         end
       end
