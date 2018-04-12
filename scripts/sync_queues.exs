@@ -24,7 +24,9 @@ IEx.pry
 inventory_queue
 |> Queue.pop
 |> Actions.Validator.validate_with([DropBox.ContentHashValidator])
-|> Actions.direct_to_queue(inventory_queue, item_queue)
+|> Actions.DirectToQueue.direct(inventory_queue, item_queue)
+## above does not work exactly - need to log and then pass item back to DirectToQueue
+### maybe don't even need DirectToQueue ?
 
 item_queue
 |> Queue.pop

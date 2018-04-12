@@ -12,6 +12,7 @@ defmodule FileSync.Actions.BuildInventoryQueue do
     queue |> Queue.push(item)
   end
 
+  # don't do anything with Folders, at least not yet
   def add_to_queue(_item, _queue) do
   end
 end
