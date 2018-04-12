@@ -8,25 +8,10 @@ defmodule FileSync.Actions.BuildFileDataQueue do
 
     item
     |> contents.get
-    |> validate(validators)
+#|> validate(validators)
     |> handle_item(file_data_queue, inventory_queue, item)
   end
 
-  defp validate(response = {:ok, _data}, []) do
-    response
-  end
-
-  defp validate({:ok, data}, validators) do
-    [validator | rest] = validators
-
-    data
-    |> validator.valid?
-    |> validate(rest)
-  end
-
-  defp validate(response, _validators) do
-    response
-  end
 
   defp handle_item({:ok, data}, data_queue, _inventory_queue, _item) do
     data_queue |> Queue.push(data)

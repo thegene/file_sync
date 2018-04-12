@@ -22,13 +22,12 @@ inventory_queue
 
 IEx.pry
 inventory_queue
-
 |> Queue.pop
-|> Actions.validate_with([DropBox.ContentHashValidator])
+|> Actions.Validator.validate_with([DropBox.ContentHashValidator])
 |> Actions.direct_to_queue(inventory_queue, item_queue)
 
 item_queue
 |> Queue.pop
 |> FileSync.FileContents.put({directory: 'data'})
-|> Actions.validate_with([FileSync.FileSizeValidator])
+|> Actions.Validator.validate_with([FileSync.FileSizeValidator])
 |> Actions.requeue_failed_save(item_queue)
