@@ -23,14 +23,14 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
     end
 
     context "when an item is on the inventory queue" do
-      let item: %InventoryItem{path: "somewhere"}
-      let validators: [validator()]
+      let item: %InventoryItem{path: "somewhere", name: "FooFile.png"}
       let source: %Source{contents: file_contents(), validators: validators()}
 
       let :mock_logger do
         Logger
         |> double
         |> allow(:info, fn(_msg) -> nil end)
+        |> allow(:error, fn(_msg) -> nil end)
       end
 
       let :opts do
@@ -48,6 +48,8 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
       end
 
       context "when we successfully get the contents" do
+        let validators: [validator()]
+
         let :file_contents do
           DropBox.FileContents
           |> double
@@ -74,6 +76,35 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
           it "logs a successful enqueue" do
             assert_received({:info, "successfully enqueued content for FooFile.png"})
           end
+        end
+      end
+
+      context "when getting contents fails" do
+        let validators: []
+
+        let :file_contents do
+          DropBox.FileContents
+          |> double
+          |> allow(:get, fn(_data, _opts) -> {:error, "something borked"} end)
+        end
+
+        it "adds the inventory item back to the inventory queue" do
+          inventory_queue()
+          |> Queue.pop
+          |> expect
+          |> to(eq(item()))
+        end
+
+        it "leaves the content queue empty" do
+          content_queue()
+          |> Queue.empty?
+          |> expect
+          |> to(eq(true))
+        end
+
+        it "logs the error message" do
+          assert_received({:error,
+            "failed getting FooFile.png, will retry: something borked"})
         end
       end
     end
