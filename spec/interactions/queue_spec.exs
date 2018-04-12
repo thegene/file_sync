@@ -13,6 +13,13 @@ defmodule FileSync.Interactions.QueueSpec do
       |> to(be_true())
     end
 
+    it "returns nil when empty" do
+      queue()
+      |> Queue.pop
+      |> expect
+      |> to(eq(nil))
+    end
+
     context "when we add one thing to it" do
       before do: queue() |> Queue.push(thing())
 
