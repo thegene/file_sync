@@ -25,7 +25,7 @@ defmodule FileSync.Boundaries.DropBox.Inventory do
   end
 
   defp build_successful_response(entries) do
-    {:ok, %{items: entries}}
+    {:ok, entries}
   end
 
   defp cast_entries(entries) do

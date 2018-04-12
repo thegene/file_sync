@@ -5,7 +5,6 @@ defmodule FileSync.Actions.BuildInventoryQueue do
 
   def push_to_queue({:ok, items}, queue) do
     items
-    |> Map.fetch!(:items)
     |> Enum.each(&add_to_queue(&1, queue))
   end
 

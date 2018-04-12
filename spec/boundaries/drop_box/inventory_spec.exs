@@ -45,7 +45,6 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
         it "parses the resulting folder contents into inventory items" do
           {:ok, list} = subject()
           list
-          |> Map.get(:items)
           |> Enum.filter(fn(item) -> match?(%InventoryItem{}, item) end)
           |> length
           |> expect
@@ -55,7 +54,6 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
         it "also parses the resulting folder contents into inventory folders" do
           {:ok, list} = subject()
           list
-          |> Map.get(:items)
           |> Enum.filter(fn(item) -> match?(%InventoryFolder{}, item) end)
           |> length
           |> expect
