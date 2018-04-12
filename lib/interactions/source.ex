@@ -1,3 +1,4 @@
 defmodule FileSync.Interactions.Source do
-  defstruct [:module, :opts]
+  #module is deprecated, will remove
+  defstruct [:module, :inventory, :contents, :opts, :validators]
 end

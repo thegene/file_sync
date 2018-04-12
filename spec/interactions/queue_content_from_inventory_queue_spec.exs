@@ -1,0 +1,73 @@
+defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
+  use ESpec
+
+  import Double
+
+  alias FileSync.Interactions.QueueContentFromInventoryQueue
+
+  alias FileSync.Actions.Queue
+  alias FileSync.Interactions.Source
+  alias FileSync.Data.{InventoryItem,FileData}
+
+  alias FileSync.Boundaries.DropBox
+
+  context "Given an inventory queue and content queue" do
+    let inventory_queue: Queue.start_link([]) |> elem(1)
+    let content_queue: Queue.start_link([]) |> elem(1)
+
+    it "starts with an empty content queue" do
+      content_queue()
+      |> Queue.empty?
+      |> expect
+      |> to(eq(true))
+    end
+
+    context "when an item is on the inventory queue" do
+      let item: %InventoryItem{path: "somewhere"}
+      let validators: [validator()]
+      let source: %Source{contents: file_contents(), validators: validators()}
+
+      let :mock_logger do
+        Logger
+        |> double
+        |> allow(:info, fn(_msg) -> nil end)
+      end
+
+      let :opts do
+        %{
+          logger: mock_logger()
+        }
+      end
+
+      before do
+        inventory_queue()
+        |> Queue.push(item())
+
+        inventory_queue()
+        |> QueueContentFromInventoryQueue.process(content_queue(), source(), opts())
+      end
+
+      context "when we successfully get the contents" do
+        let :file_contents do
+          DropBox.FileContents
+          |> double
+          |> allow(:get, fn(_data) -> {:ok, %FileData{}} end)
+        end
+
+        context "when validators pass" do
+          let :validator do
+            DropBox.ContentHashValidator
+            |> double
+            |> allow(:valid?, fn(res) -> res end)
+          end
+
+          it "adds filedata to the content queue" do
+            content_queue()
+            |> Queue.empty?
+            |> to(eq(false))
+          end
+        end
+      end
+    end
+  end
+end
