@@ -3,7 +3,7 @@ defmodule FileSync.Interactions.InventoryQueue do
   alias FileSync.Interactions.Queue
   alias FileSync.Data.InventoryItem
 
-  def push_to_queue(inventory_response, {:ok, queue}) do
+  def push_to_queue(inventory_response, queue) do
     {:ok, list} = inventory_response
 
     list

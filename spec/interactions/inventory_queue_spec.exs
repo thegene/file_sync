@@ -5,7 +5,7 @@ defmodule FileSync.Interactions.InventoryQueueSpec do
   alias FileSync.Data.{InventoryFolder,InventoryItem}
 
   context "Given a queue and a successful inventory response" do
-    let queue: Queue.start_link([])
+    let queue: Queue.start_link([]) |> elem(1)
     let :inventory_response do
       {:ok, [
         %InventoryItem{name: "some item"},
@@ -15,7 +15,6 @@ defmodule FileSync.Interactions.InventoryQueueSpec do
 
     it "starts empty for sanity" do
       queue()
-      |> elem(1)
       |> Queue.empty?
       |> expect
       |> to(be_true())
@@ -28,13 +27,11 @@ defmodule FileSync.Interactions.InventoryQueueSpec do
 
       let :inventory_item do
         queue()
-        |> elem(1)
         |> Queue.pop
       end
 
       it "is no longer empty" do
         queue()
-        |> elem(1)
         |> Queue.empty?
         |> expect
         |> not_to(be_true())
@@ -50,7 +47,6 @@ defmodule FileSync.Interactions.InventoryQueueSpec do
       it "does not contain the folder" do
         inventory_item()
         queue()
-        |> elem(1)
         |> Queue.empty?
         |> expect
         |> to(be_true())
