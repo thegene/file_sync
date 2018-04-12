@@ -15,6 +15,18 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
     let inventory_queue: Queue.start_link([]) |> elem(1)
     let content_queue: Queue.start_link([]) |> elem(1)
 
+    let :passing_validator do
+      DropBox.ContentHashValidator
+      |> double
+      |> allow(:valid?, fn(res) -> res end)
+    end
+
+    let :failing_validator do
+      DropBox.ContentHashValidator
+      |> double
+      |> allow(:valid?, fn(_res) -> {:error, "validation failed"} end)
+    end
+
     it "starts with an empty content queue" do
       content_queue()
       |> Queue.empty?
@@ -61,11 +73,7 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
         end
 
         context "when validators pass" do
-          let :validator do
-            DropBox.ContentHashValidator
-            |> double
-            |> allow(:valid?, fn(res) -> res end)
-          end
+          let validator: passing_validator()
 
           it "adds filedata to the content queue" do
             content_queue()
@@ -79,11 +87,7 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
         end
 
         context "when validators fail" do
-          let :validator do
-            DropBox.ContentHashValidator
-            |> double
-            |> allow(:valid?, fn(_res) -> {:error, "validation failed"} end)
-          end
+          let validator: failing_validator()
 
           it "does not add anything to filedata queue" do
             content_queue()
@@ -107,31 +111,56 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
       end
 
       context "when getting contents fails" do
-        let validators: []
-
         let :file_contents do
           DropBox.FileContents
           |> double
           |> allow(:get, fn(_data, _opts) -> {:error, "something borked"} end)
         end
 
-        it "adds the inventory item back to the inventory queue" do
-          inventory_queue()
-          |> Queue.pop
-          |> expect
-          |> to(eq(item()))
+        context "when there are no validators" do
+          let validators: []
+
+          it "logs the error message" do
+            assert_received({:error,
+              "failed getting FooFile.png, will retry: something borked"})
+          end
+
+          it "adds the inventory item back to the inventory queue" do
+            inventory_queue()
+            |> Queue.pop
+            |> expect
+            |> to(eq(item()))
+          end
+
+          it "leaves the content queue empty" do
+            content_queue()
+            |> Queue.empty?
+            |> expect
+            |> to(eq(true))
+          end
         end
 
-        it "leaves the content queue empty" do
-          content_queue()
-          |> Queue.empty?
-          |> expect
-          |> to(eq(true))
-        end
+        context "when there is a validator" do
+          let validators: [passing_validator()]
 
-        it "logs the error message" do
-          assert_received({:error,
-            "failed getting FooFile.png, will retry: something borked"})
+          it "logs the error message" do
+            assert_received({:error,
+              "failed getting FooFile.png, will retry: something borked"})
+          end
+
+          it "adds the inventory item back to the inventory queue" do
+            inventory_queue()
+            |> Queue.pop
+            |> expect
+            |> to(eq(item()))
+          end
+
+          it "leaves the content queue empty" do
+            content_queue()
+            |> Queue.empty?
+            |> expect
+            |> to(eq(true))
+          end
         end
       end
     end
