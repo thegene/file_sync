@@ -19,7 +19,7 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
     end
 
     context "when we process an empty inventory queue" do
-      let :inventory do
+      let :contents do
         FileContents
         |> double
         |> allow(:get, &(&1))
@@ -27,7 +27,7 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
 
       before do
         inventory_queue()
-        |> BuildFileDataQueue.process_to(file_data_queue(), inventory())
+        |> BuildFileDataQueue.process_to(file_data_queue(), contents())
       end
 
       it "still has an empty data queue" do
@@ -46,11 +46,11 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
 
       let! :response do
         inventory_queue()
-        |> BuildFileDataQueue.process_to(file_data_queue(), inventory())
+        |> BuildFileDataQueue.process_to(file_data_queue(), contents())
       end
 
       context "and the inventory gets data successfully" do
-        let :inventory do
+        let :contents do
           FileContents
           |> double
           |> allow(:get, fn(_item) -> {:ok, %FileData{name: "foo"}} end)
@@ -78,8 +78,8 @@ defmodule FileSync.Interactions.BuildFileDataQueueSpec do
         end
       end
 
-      context "and the inventory fails to get data successfully" do
-        let :inventory do
+      context "and the contents fails to get data successfully" do
+        let :contents do
           FileContents
           |> double
           |> allow(:get, fn(_item) -> {:error, "something borked"} end)

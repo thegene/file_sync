@@ -2,11 +2,11 @@ defmodule FileSync.Interactions.BuildFileDataQueue do
 
   alias FileSync.Interactions.Queue
 
-  def process_to(inventory_queue, file_data_queue, inventory) do
+  def process_to(inventory_queue, file_data_queue, contents) do
     item = inventory_queue |> Queue.pop
 
     item
-    |> inventory.get
+    |> contents.get
     |> handle_item(file_data_queue, inventory_queue, item)
   end
 
