@@ -1,9 +1,9 @@
-defmodule FileSync.Interactions.BuildFileDataQueueSpec do
+defmodule FileSync.Actions.BuildFileDataQueueSpec do
   use ESpec
 
   import Double
 
-  alias FileSync.Interactions.{BuildFileDataQueue,Queue}
+  alias FileSync.Actions.{BuildFileDataQueue,Queue}
   alias FileSync.Data.{InventoryItem,FileData}
   alias FileSync.Boundaries.DropBox.{FileContents,ContentHashValidator}
 

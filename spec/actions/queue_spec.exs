@@ -1,7 +1,7 @@
-defmodule FileSync.Interactions.QueueSpec do
+defmodule FileSync.Actions.QueueSpec do
   use ESpec
 
-  alias FileSync.Interactions.Queue
+  alias FileSync.Actions.Queue
 
   context "Given a Queue" do
     let queue: Queue.start_link([]) |> elem(1)

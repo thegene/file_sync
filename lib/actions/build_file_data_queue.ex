@@ -1,7 +1,7 @@
-defmodule FileSync.Interactions.BuildFileDataQueue do
+defmodule FileSync.Actions.BuildFileDataQueue do
 
   require IEx
-  alias FileSync.Interactions.Queue
+  alias FileSync.Actions.Queue
 
   def process_to(inventory_queue, file_data_queue, contents, validators) do
     item = inventory_queue |> Queue.pop

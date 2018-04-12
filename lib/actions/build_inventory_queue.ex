@@ -1,6 +1,6 @@
-defmodule FileSync.Interactions.InventoryQueue do
+defmodule FileSync.Actions.BuildInventoryQueue do
 
-  alias FileSync.Interactions.Queue
+  alias FileSync.Actions.Queue
   alias FileSync.Data.InventoryItem
 
   def push_to_queue({:ok, items}, queue) do

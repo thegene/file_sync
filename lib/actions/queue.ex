@@ -1,4 +1,4 @@
-defmodule FileSync.Interactions.Queue do
+defmodule FileSync.Actions.Queue do
   use Agent
 
   def start_link(_opts) do
