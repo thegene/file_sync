@@ -1,7 +1,8 @@
-defmodule FileSync.Actions.BuildInventoryQueueSpec do
+defmodule FileSync.Interactions.BuildInventoryQueueSpec do
   use ESpec
 
-  alias FileSync.Actions.{Queue,BuildInventoryQueue}
+  alias FileSync.Actions.Queue
+  alias FileSync.Interactions.BuildInventoryQueue
   alias FileSync.Data.{InventoryFolder,InventoryItem}
 
   context "Given a queue and a successful inventory response" do
