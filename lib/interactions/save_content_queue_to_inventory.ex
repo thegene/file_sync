@@ -8,12 +8,12 @@ defmodule FileSync.Interactions.SaveContentQueueToInventory do
 
     item
     |> source.contents.put(source.opts)
-    |> validate(source.validators)
+    |> validate(source)
     |> handle_message(queue, item, dependencies)
   end
 
-  defp validate(message = {:ok, _data}, validators) do
-    message |> Validator.validate_with(validators)
+  defp validate(message = {:ok, _data}, source) do
+    message |> Validator.validate_with(source)
   end
 
   defp validate(res, _validators), do: res

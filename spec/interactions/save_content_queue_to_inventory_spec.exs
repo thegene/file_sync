@@ -42,7 +42,7 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
     let :success_validator do
       FileSizeValidator
       |> double
-      |> allow(:valid?, fn(data = %FileData{}) ->
+      |> allow(:valid?, fn(data = %FileData{}, _source) ->
         {:ok, data}
       end)
     end
@@ -50,7 +50,7 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
     let :fail_validator do
       FileSizeValidator
       |> double
-      |> allow(:valid?, fn(_data = %FileData{}) ->
+      |> allow(:valid?, fn(_data = %FileData{}, _source) ->
         {:error, "File size validation failed!"}
       end)
     end

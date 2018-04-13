@@ -4,23 +4,24 @@ defmodule FileSync.Actions.ValidatorSpec do
   import Double
 
   alias FileSync.Actions.Validator
+  alias FileSync.Interactions.Source
   alias FileSync.Boundaries.DropBox.ContentHashValidator
 
   context "Given a message to validate" do
     let message: {:ok, %{}}
-
-    let subject: message() |> Validator.validate_with(validator_list())
+    let source: %Source{validators: validator_list()}
+    let subject: message() |> Validator.validate_with(source())
 
     let :passing_validator do
       ContentHashValidator
       |> double
-      |> allow(:valid?, fn(_message) -> {:ok, %{}} end)
+      |> allow(:valid?, fn(_message, _source = %Source{}) -> {:ok, %{}} end)
     end
 
     let :failing_validator do
       ContentHashValidator
       |> double
-      |> allow(:valid?, fn(_message) ->
+      |> allow(:valid?, fn(_message, _source = %Source{}) ->
         {:error, "failed for some reason"}
       end)
     end

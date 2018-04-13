@@ -2,11 +2,13 @@ defmodule FileSync.Boundaries.DropBox.ContentHashValidator do
   require IEx
   
   alias FileSync.Data.FileData
+  alias FileSync.Interactions.Source
   alias FileSync.Boundaries.DropBox.SourceMeta
 
   def valid?(data = %FileData{
                        content: content,
-                       source_meta: %SourceMeta{content_hash: hash}}) do
+                       source_meta: %SourceMeta{content_hash: hash}},
+             _source = %Source{}) do
     content
     |> content_chunk
     |> build_hashes

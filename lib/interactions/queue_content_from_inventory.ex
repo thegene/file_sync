@@ -8,7 +8,7 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
 
     item
     |> get_data(source, opts)
-    |> validate(source.validators)
+    |> validate(source)
     |> enqueue(inventory_queue, content_queue, item, opts)
   end
 
@@ -16,8 +16,8 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
     item |> source.contents.get(opts)
   end
 
-  defp validate(message, validators) do
-    message |> Validator.validate_with(validators)
+  defp validate(message, source) do
+    message |> Validator.validate_with(source)
   end
 
   defp enqueue({:ok, file_data}, _inventory_queue, content_queue, _original_item, opts) do

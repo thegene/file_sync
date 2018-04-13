@@ -18,13 +18,13 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
     let :passing_validator do
       DropBox.ContentHashValidator
       |> double
-      |> allow(:valid?, fn(res) -> res end)
+      |> allow(:valid?, fn(res, _source) -> {:ok, res} end)
     end
 
     let :failing_validator do
       DropBox.ContentHashValidator
       |> double
-      |> allow(:valid?, fn(_res) -> {:error, "validation failed"} end)
+      |> allow(:valid?, fn(_res, _source) -> {:error, "validation failed"} end)
     end
 
     it "starts with an empty content queue" do
