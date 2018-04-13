@@ -10,8 +10,15 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
 
   context "Given a queue with a FileData item" do
     let queue: Queue.start_link([]) |> elem(1)
-
     let item: %FileData{name: "foobar.gif"}
+    let dependencies: %{logger: mock_logger()}
+
+    let :mock_logger do
+      Logger
+      |> double
+      |> allow(:info, fn(_msg) -> :ok end)
+      |> allow(:error, fn(_msg) -> :ok end)
+    end
 
     before do
       queue()
@@ -20,7 +27,7 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
 
     context "when we attempt to put file data to an inventory" do
       before do
-        queue() |> SaveContentQueueToInventory.save_to(inventory(), opts())
+        queue() |> SaveContentQueueToInventory.save_to(inventory(), opts(), dependencies())
       end
 
       let opts: %{foo: "bar"}
@@ -53,6 +60,9 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
           |> to(eq(true))
         end
 
+        it "logs that it was successful" do
+          assert_received({:info, "Successfully saved foobar.gif"})
+        end
       end
 
       context "and it fails" do
@@ -65,6 +75,9 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
           |> to(eq(item()))
         end
 
+        it "logs that it errored" do
+          assert_received({:error, "Failed to save foobar.gif, requeueing: Oh no!"})
+        end
       end
     end
   end
