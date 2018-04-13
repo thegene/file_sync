@@ -35,8 +35,8 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
           |> allow(:binwrite, fn("SOME PID", _) -> :ok end)
 
         it "returns an :ok" do
-          {:ok, message} = subject()
-          expect(message).to eq("Successfully wrote baz.txt")
+          {:ok, data} = subject()
+          expect(data).to eq(file_data())
         end
 
         it "writes to IO" do

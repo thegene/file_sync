@@ -33,7 +33,7 @@ defmodule FileSync.Boundaries.FileSystem.FileContents do
   end
 
   defp respond(:ok, file_data) do
-    {:ok, "Successfully wrote #{file_data.name}"}
+    {:ok, file_data}
   end
 
   defp respond({:error, message}, file_data) do

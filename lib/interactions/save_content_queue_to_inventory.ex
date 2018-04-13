@@ -1,19 +1,28 @@
 defmodule FileSync.Interactions.SaveContentQueueToInventory do
-  alias FileSync.Actions.Queue
 
-  def save_to(queue, inventory, opts, dependencies) do
+  alias FileSync.Actions.{Queue,Validator}
+  alias FileSync.Interactions.Source
+
+  def save_to(queue, source = %Source{}, dependencies) do
     item = queue |> Queue.pop
 
     item
-    |> inventory.put(opts)
-    |> handle_put_message(queue, item, dependencies)
+    |> source.contents.put(source.opts)
+    |> validate(source.validators)
+    |> handle_message(queue, item, dependencies)
   end
 
-  defp handle_put_message({:ok, _message}, _queue, item, dependencies) do
+  defp validate(message = {:ok, _data}, validators) do
+    message |> Validator.validate_with(validators)
+  end
+
+  defp validate(res, _validators), do: res
+
+  defp handle_message({:ok, _message}, _queue, item, dependencies) do
     dependencies |> info("Successfully saved #{item.name}")
   end
 
-  defp handle_put_message({:error, message}, queue, item, dependencies) do
+  defp handle_message({:error, message}, queue, item, dependencies) do
     queue |> Queue.push(item)
     dependencies |> error("Failed to save #{item.name}, requeueing: #{message}")
   end
