@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
   use ESpec
 
-  alias FileSync.Boundaries.FileSystem.FileContents
+  alias FileSync.Boundaries.FileSystem.{FileContents,Options}
   alias FileSync.Data.FileData
 
   import Double
@@ -15,7 +15,7 @@ defmodule FileSync.Boundaries.FileSystem.FileContentsSpec do
       let :subject, do:
         FileContents.put(
                          file_data(),
-                         %{
+                         %Options{
                            file_system: mock_file_system(),
                            io: mock_io(),
                            directory: "/foo/bar"

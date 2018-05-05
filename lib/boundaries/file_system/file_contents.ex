@@ -1,6 +1,9 @@
 defmodule FileSync.Boundaries.FileSystem.FileContents do
 
-  def put(file_data, opts) do
+  alias FileSync.Data.FileData
+  alias FileSync.Boundaries.FileSystem.Options
+
+  def put(file_data, opts = %Options{}) do
     file_system = Map.get(opts, :file_system, File)
     io = Map.get(opts, :io, IO)
     base_path = opts.directory
