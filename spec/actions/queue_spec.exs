@@ -4,7 +4,7 @@ defmodule FileSync.Actions.QueueSpec do
   alias FileSync.Actions.Queue
 
   context "Given a Queue" do
-    let queue: Queue.start_link([]) |> elem(1)
+    let queue: Queue.start_link() |> elem(1)
 
     it "starts empty" do
       queue()
