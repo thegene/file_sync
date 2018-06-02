@@ -19,6 +19,10 @@ defmodule FileSync.Actions.Queue do
     |> handle_pop(queue)
   end
 
+  def find_queue(name) do
+    GenServer.whereis(name)
+  end
+
   defp agent_opts(opts) do
     opts |> Keyword.get(:agent, [])
   end
