@@ -3,7 +3,7 @@ defmodule FileSync.Actions.QueueSpec do
 
   alias FileSync.Actions.Queue
 
-  context "Given a Queue" do
+  context "Given a default Queue" do
     let queue: Queue.start_link() |> elem(1)
 
     it "starts empty" do
@@ -117,6 +117,17 @@ defmodule FileSync.Actions.QueueSpec do
           end
         end
       end
+    end
+  end
+
+  context "Given a queue with an initial value" do
+    let queue: Queue.start_link(value: {:foo, {}}) |> elem(1)
+
+    it "is not empty" do
+      queue()
+      |> Queue.empty?
+      |> expect
+      |> to(be_false())
     end
   end
 end

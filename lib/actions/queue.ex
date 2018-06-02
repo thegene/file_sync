@@ -2,7 +2,7 @@ defmodule FileSync.Actions.Queue do
   use Agent
 
   def start_link(opts \\ []) do
-    Agent.start_link(fn -> {} end, opts)
+    Agent.start_link(fn -> initial_value(opts) end, agent_opts(opts))
   end
 
   def empty?(queue) do
@@ -17,6 +17,14 @@ defmodule FileSync.Actions.Queue do
     queue
     |> get
     |> handle_pop(queue)
+  end
+
+  defp agent_opts(opts) do
+    opts |> Keyword.get(:agent, [])
+  end
+
+  defp initial_value(opts) do
+    opts |> Keyword.get(:value, {})
   end
 
   defp push_new_value({head, tail}, item) do
