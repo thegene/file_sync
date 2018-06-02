@@ -129,7 +129,6 @@ defmodule FileSync.Actions.QueueSpec do
       |> expect
       |> to(be_false())
     end
-
   end
 
   context "Given a named queue" do
@@ -142,5 +141,4 @@ defmodule FileSync.Actions.QueueSpec do
       |> to(eq(found_queue()))
     end
   end
-
 end
