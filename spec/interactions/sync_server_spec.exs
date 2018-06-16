@@ -29,28 +29,47 @@ defmodule FileSync.Interactions.SyncServerSpec do
       folder: "foo"
     }
 
-    let :mock_file_contents do
-      DropBox.FileContents
-      |> double
-      |> allow(:get, fn(%InventoryItem{}) ->
-        {:ok, %FileData{}}
-      end)
-    end
-
     context "when the inventory successfully returns items" do
       let :mock_inventory do
         DropBox.Inventory
         |> double
         |> allow(:get, fn(%{folder: "foo"}) ->
-          {:ok, [%InventoryItem{}]}
+          {:ok, [%InventoryItem{path: "foo"}]}
         end)
       end
 
-      it "populates a queue for now" do
-        queue()
-        |> Queue.empty?
-        |> expect
-        |> not_to(be_true())
+      context "and file contents successfully fetches file data" do
+        let :mock_file_contents do
+          DropBox.FileContents
+          |> double
+          |> allow(:get, fn(%InventoryItem{path: "foo"}) ->
+            {:ok, %FileData{}}
+          end)
+        end
+
+        it "populates a queue for now" do
+          queue()
+          |> Queue.empty?
+          |> expect
+          |> not_to(be_true())
+        end
+      end
+
+      context "and file contents fails to get file data" do
+        let :mock_file_contents do
+          DropBox.FileContents
+          |> double
+          |> allow(:get, fn(%InventoryItem{path: "foo"}) ->
+            {:error, "file not found"}
+          end)
+        end
+
+        it "populates a queue for now" do
+          queue()
+          |> Queue.empty?
+          |> expect
+          |> to(be_true())
+        end
       end
     end
 
