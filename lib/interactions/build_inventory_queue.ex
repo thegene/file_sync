@@ -3,7 +3,7 @@ defmodule FileSync.Interactions.BuildInventoryQueue do
   alias FileSync.Actions.Queue
   alias FileSync.Data.InventoryItem
 
-  def push_to_queue({:ok, items}, queue) do
+  def push_to_queue(items, queue) do
     items
     |> Enum.each(&add_to_queue(&1, queue))
   end

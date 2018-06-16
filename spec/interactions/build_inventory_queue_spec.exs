@@ -8,10 +8,10 @@ defmodule FileSync.Interactions.BuildInventoryQueueSpec do
   context "Given a queue and a successful inventory response" do
     let queue: Queue.start_link([]) |> elem(1)
     let :inventory_response do
-      {:ok, [
+      [
         %InventoryItem{name: "some item"},
         %InventoryFolder{}
-      ]}
+      ]
     end
 
     it "starts empty for sanity" do
