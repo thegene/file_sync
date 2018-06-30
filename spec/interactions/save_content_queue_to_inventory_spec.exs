@@ -11,7 +11,6 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
   context "Given a queue with a FileData item" do
     let queue: Queue.start_link([]) |> elem(1)
     let item: %FileData{name: "foobar.gif"}
-    let dependencies: %{logger: mock_logger()}
     let opts: %{foo: "bar"}
 
     let source: %Source{
@@ -19,13 +18,6 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
       opts: opts(),
       validators: [validator()]
     }
-
-    let :mock_logger do
-      Logger
-      |> double
-      |> allow(:info, fn(_msg) -> :ok end)
-      |> allow(:error, fn(_msg) -> :ok end)
-    end
 
     let :success_inventory do
       FileContents
@@ -64,7 +56,8 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
 
     context "when we attempt to put file data to an inventory" do
       before do
-        queue() |> SaveContentQueueToInventory.save_to(source(), dependencies())
+        message = queue() |> SaveContentQueueToInventory.save_to(source())
+        {:shared, %{message: message}}
       end
 
       let inventory: success_inventory()
@@ -86,8 +79,10 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
             |> to(eq(true))
           end
 
-          it "logs that it was successful" do
-            assert_received({:info, "Successfully saved foobar.gif"})
+          it "returns an ok message" do
+            shared.message
+            |> expect
+            |> to(eq({:ok, "Successfully saved foobar.gif"}))
           end
         end
 
@@ -101,8 +96,11 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
             |> to(eq(item()))
           end
 
-          it "logs that it errored" do
-            assert_received({:error, "Failed to save foobar.gif, requeueing: File size validation failed!"})
+          it "returns an error message" do
+            shared.message
+            |> expect
+            |> to(eq({:error, "Failed to save foobar.gif, requeueing: " <>
+              "File size validation failed!"}))
           end
         end
       end
@@ -117,8 +115,10 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
           |> to(eq(item()))
         end
 
-        it "logs that it errored" do
-          assert_received({:error, "Failed to save foobar.gif, requeueing: Oh no!"})
+        it "returns an error message" do
+          shared.message
+          |> expect
+          |> to(eq({:error, "Failed to save foobar.gif, requeueing: Oh no!"}))
         end
       end
     end
