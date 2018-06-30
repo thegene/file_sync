@@ -6,31 +6,28 @@ defmodule FileSync.Interactions.SyncServer do
 
   def sync(opts) do
     source = opts |> Keyword.get(:source)
+    target = opts |> Keyword.get(:target)
 
-    content_queue = opts |> Keyword.get(:queue)
+    inventory = find_queue(source.queue_name)
+    contents = find_queue(target.queue_name)
 
     source
     |> get_inventory_items
-    |> build_inventory_queue(inventory_queue)
+    |> populate_inventory_queue(inventory)
     
-    inventory_queue |> populate_content_queue(content_queue)
+    inventory
+    |> populate_content_queue(contents, target)
   end
 
-  #  defp content_queue do
-  #    Queue.find_queue(:content) || new_content_queue()
-  #  end
-  #
-  #  defp new_content_queue do
-  #   {:ok, queue} = Queue.start_link(agent: [name: :content])
-  #   queue
-  #  end
-  #
-  defp inventory_queue do
-    Queue.find_queue(:inventory) || new_inventory_queue()
+  defp populate_content_queue(_queue, _thing, _other) do
   end
 
-  defp new_inventory_queue do
-   {:ok, queue} = Queue.start_link(agent: [name: :inventory])
+  defp find_queue(name) do
+    Queue.find_queue(name) || new_queue(name)
+  end
+
+  defp new_queue(name) do
+   {:ok, queue} = Queue.start_link(agent: [name: name])
    queue
   end
 
@@ -38,10 +35,10 @@ defmodule FileSync.Interactions.SyncServer do
     source.inventory.get(source.opts)
   end
 
-  defp build_inventory_queue({:ok, items}, queue) do
+  defp populate_inventory_queue({:ok, items}, queue) do
     BuildInventoryQueue.push_to_queue(items, queue)
   end
 
-  defp build_inventory_queue(_res, _queue) do
+  defp populate_inventory_queue(_res, _queue) do
   end
 end
