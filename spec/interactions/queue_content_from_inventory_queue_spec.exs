@@ -38,25 +38,14 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
       let item: %InventoryItem{path: "somewhere", name: "FooFile.png"}
       let source: %Source{contents: file_contents(), validators: validators()}
 
-      let :mock_logger do
-        Logger
-        |> double
-        |> allow(:info, fn(_msg) -> nil end)
-        |> allow(:error, fn(_msg) -> nil end)
-      end
-
-      let :opts do
-        %{
-          logger: mock_logger()
-        }
-      end
-
       before do
         inventory_queue()
         |> Queue.push(item())
 
-        inventory_queue()
-        |> QueueContentFromInventoryQueue.process(content_queue(), source(), opts())
+        message = inventory_queue()
+        |> QueueContentFromInventoryQueue.process(content_queue(), source())
+
+        {:shared, %{message: message}}
       end
 
       context "when we successfully get the contents" do
@@ -81,8 +70,10 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
             |> to(eq(file_data()))
           end
 
-          it "logs a successful enqueue" do
-            assert_received({:info, "successfully enqueued content for FooFile.png"})
+          it "returns a success message" do
+            shared.message
+            |> expect
+            |> to(eq({:ok, "Successfully enqueued content for FooFile.png"}))
           end
         end
 
@@ -103,9 +94,11 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
             |> to(eq(item()))
           end
 
-          it "logs a validation error" do
-            assert_received({:error,
-              "failed getting FooFile.png, will retry: validation failed"})
+          it "returns an error message" do
+            shared.message
+            |> expect
+            |> to(eq({:error, "Failed getting FooFile.png, " <>
+              "will retry: validation failed"}))
           end
         end
       end
@@ -120,9 +113,11 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
         context "when there are no validators" do
           let validators: []
 
-          it "logs the error message" do
-            assert_received({:error,
-              "failed getting FooFile.png, will retry: something borked"})
+          it "returns an error message" do
+            shared.message
+            |> expect
+            |> to(eq({:error, "Failed getting FooFile.png, " <>
+              "will retry: something borked"}))
           end
 
           it "adds the inventory item back to the inventory queue" do
@@ -143,9 +138,11 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
         context "when there is a validator" do
           let validators: [passing_validator()]
 
-          it "logs the error message" do
-            assert_received({:error,
-              "failed getting FooFile.png, will retry: something borked"})
+          it "returns an error message" do
+            shared.message
+            |> expect
+            |> to(eq({:error, "Failed getting FooFile.png, " <>
+              "will retry: something borked"}))
           end
 
           it "adds the inventory item back to the inventory queue" do
