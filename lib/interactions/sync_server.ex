@@ -19,7 +19,7 @@ defmodule FileSync.Interactions.SyncServer do
     |> populate_content_queue(contents, target)
   end
 
-  defp populate_content_queue(_queue, _thing, _other) do
+  defp populate_content_queue(inventory, contents, target) do
   end
 
   defp find_queue(name) do

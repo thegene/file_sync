@@ -60,7 +60,7 @@ defmodule FileSync.Interactions.SyncServerSpec do
           content_queue()
           |> Queue.empty?
           |> expect
-          |> to(be_true())
+          |> to_not(be_true())
         end
       end
 
@@ -77,7 +77,7 @@ defmodule FileSync.Interactions.SyncServerSpec do
           inventory_queue()
           |> Queue.empty?
           |> expect
-          |> to(be_true())
+          |> to_not(be_true())
         end
       end
     end
