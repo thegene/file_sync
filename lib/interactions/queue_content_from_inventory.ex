@@ -31,18 +31,4 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
 
     {:error, "Failed getting #{original_item.name}, will retry: #{message}"}
   end
-
-  defp error(opts, message) do
-    logger = logger_from_opts(opts)
-    logger.error(message)
-  end
-
-  defp info(opts, message) do
-    logger = logger_from_opts(opts)
-    logger.info(message)
-  end
-
-  defp logger_from_opts(opts) do
-    opts |> Map.get(:logger, Logger)
-  end
 end
