@@ -36,6 +36,16 @@ defmodule FileSync.Actions.ValidatorSpec do
       end
     end
 
+    context "with nil validator_list" do
+      let validator_list: nil
+
+      it "returns the message" do
+        subject()
+        |> expect
+        |> to(eq(message()))
+      end
+    end
+
     context "with a single validator" do
       let validator_list: [validator()]
 
