@@ -2,7 +2,11 @@ defmodule FileSync.Interactions.SyncServer do
   require IEx
 
   alias FileSync.Actions.Queue
-  alias FileSync.Interactions.BuildInventoryQueue
+  alias FileSync.Interactions.{
+    BuildInventoryQueue,
+    QueueContentFromInventoryQueue,
+    SaveContentQueueToInventory
+  }
 
   def sync(opts) do
     source = opts |> Keyword.get(:source)
@@ -16,10 +20,23 @@ defmodule FileSync.Interactions.SyncServer do
     |> populate_inventory_queue(inventory)
     
     inventory
-    |> populate_content_queue(contents, target)
+    |> populate_content_queue(contents, source)
+
+    contents
+    |> save_to_target(target)
   end
 
-  defp populate_content_queue(inventory, contents, target) do
+  defp save_to_target(content_queue, target) do
+    content_queue
+    |> SaveContentQueueToInventory.save_to(target)
+  end
+
+  defp populate_content_queue(inventory, contents, source) do
+    QueueContentFromInventoryQueue.process(inventory, contents, source)
+
+    if !Queue.empty?(inventory) do
+      inventory |> populate_content_queue(contents, source)
+    end
   end
 
   defp find_queue(name) do
