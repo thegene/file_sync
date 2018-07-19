@@ -1,5 +1,5 @@
 defmodule FileSync.Interactions.InventoryQueueWatcher do
-  #use GenServer
+  use GenServer
 
   alias FileSync.Interactions.QueueContentFromInventoryQueue
 
@@ -20,6 +20,6 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
   end
 
   defp handle_response({:error, message}, logger) do
-    logger.warn(logger)
+    logger.warn(message)
   end
 end
