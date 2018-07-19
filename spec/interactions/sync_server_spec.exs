@@ -10,7 +10,7 @@ defmodule FileSync.Interactions.SyncServerSpec do
 
   import Double
 
-  context "Given a source and a target source" do
+  xcontext "Given a source and a target source" do
     before do
       SyncServer.sync(source: source(), target: target())
     end
