@@ -4,8 +4,15 @@ defmodule FileSync.Interactions.SaveContentQueueToInventory do
   alias FileSync.Interactions.Source
 
   def save_to(queue, source = %Source{}) do
-    item = queue |> Queue.pop
+    queue
+    |> Queue.pop
+    |> save(source, queue)
+  end
 
+  defp save(nil, _source, _queue) do
+  end
+
+  defp save(item, source, queue) do
     item
     |> source.contents.put(source.opts)
     |> validate(source)

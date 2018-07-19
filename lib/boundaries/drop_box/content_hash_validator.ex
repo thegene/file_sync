@@ -1,5 +1,4 @@
 defmodule FileSync.Boundaries.DropBox.ContentHashValidator do
-  require IEx
   
   alias FileSync.Data.FileData
   alias FileSync.Interactions.Source

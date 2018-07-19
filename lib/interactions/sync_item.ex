@@ -1,5 +1,4 @@
 defmodule FileSync.Interactions.SyncItem do
-  alias FileSync.Data.FileData
   alias FileSync.Interactions.Source
 
   def sync({:ok, data}, %Source{module: target_module, opts: target_opts}) do
@@ -13,7 +12,7 @@ defmodule FileSync.Interactions.SyncItem do
     handle_response_message(response, "Item")
   end
 
-  defp handle_response_message({:ok, message}, file_name) do
+  defp handle_response_message({:ok, _message}, file_name) do
     {:ok, "#{file_name} sync successful"}
   end
 

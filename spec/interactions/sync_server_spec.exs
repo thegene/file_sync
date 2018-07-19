@@ -19,13 +19,17 @@ defmodule FileSync.Interactions.SyncServerSpec do
       inventory: mock_inventory(),
       opts: source_opts(),
       contents: mock_db_contents(),
-      queue_name: :source_queue
+      validators: source_validators(),
+      queue_name: :source_queue,
+      logger: mock_logger()
     }
 
     let target: %Source{
       queue_name: :target_queue,
       contents: mock_fs_contents(),
-      opts: target_opts()
+      validators: target_validators(),
+      opts: target_opts(),
+      logger: mock_logger()
     }
 
     let source_opts: %{
@@ -39,6 +43,26 @@ defmodule FileSync.Interactions.SyncServerSpec do
     let mock_db_contents: %{}
     let mock_fs_contents: %{}
 
+    let :mock_logger do
+      Logger
+      |> double
+      |> allow(:warn, fn(_) -> nil end)
+    end
+
+    let :failing_validator do
+      FileSystem.FileSizeValidator
+      |> double
+      |> allow(:valid?, fn(_data, _source) -> {:error, "ka-bork"} end)
+    end
+
+    let :passing_validator do
+      DropBox.ContentHashValidator
+      |> double
+      |> allow(:valid?, fn(data, _source) -> {:ok, data} end)
+    end
+
+    let source_validators: []
+    let target_validators: []
 
     let :content_queue do
       Process.sleep(1) # sometimes the agent process is not ready yet
@@ -55,7 +79,7 @@ defmodule FileSync.Interactions.SyncServerSpec do
         DropBox.Inventory
         |> double
         |> allow(:get, fn(%{folder: "foo"}) ->
-          {:ok, [%InventoryItem{path: "foo"}]}
+          {:ok, [%InventoryItem{path: "foo", name: "foobar"}]}
         end)
       end
 
@@ -78,12 +102,32 @@ defmodule FileSync.Interactions.SyncServerSpec do
           end)
         end
 
-        it "sends the file contents to the target source" do
-          assert_received({
-            :put,
-            %FileData{},
-            %FileSystem.Options{}
-          })
+        context "and validation passes" do
+          let source_validators: [passing_validator()]
+
+          it "sends the file contents to the target source" do
+            assert_received({
+              :put,
+              %FileData{},
+              %FileSystem.Options{}
+            })
+          end
+        end
+
+        context "but validation fails" do
+          let source_validators: [failing_validator()]
+
+          it "does not send the file contents to the target source" do
+            refute_received({
+              :put,
+              %FileData{},
+              %FileSystem.Options{}
+            })
+          end
+
+          it "logs the error message" do
+            assert_received({:warn, "Failed getting foobar, will retry: ka-bork"})
+          end
         end
       end
 

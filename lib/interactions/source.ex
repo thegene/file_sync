@@ -6,6 +6,7 @@ defmodule FileSync.Interactions.Source do
     :contents, # module to use for fetching and saving contents
     :opts, # opts to pass to modules used
     :validators, # validators to use on fetched file contents
-    :queue_name # the name of the queue to be used
+    :queue_name, # the name of the queue to be used
+    logger: FileSync.Interactions.Logger
   ]
 end

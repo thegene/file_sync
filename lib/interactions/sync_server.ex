@@ -1,5 +1,4 @@
 defmodule FileSync.Interactions.SyncServer do
-  require IEx
 
   alias FileSync.Actions.Queue
   alias FileSync.Interactions.{
@@ -32,10 +31,18 @@ defmodule FileSync.Interactions.SyncServer do
   end
 
   defp populate_content_queue(inventory, contents, source) do
-    QueueContentFromInventoryQueue.process(inventory, contents, source)
+    {res, message} = QueueContentFromInventoryQueue.process(
+      inventory,
+      contents,
+      source
+    )
 
-    if !Queue.empty?(inventory) do
-      inventory |> populate_content_queue(contents, source)
+    case res do
+      :error -> source.logger.warn(message)
+      :ok ->
+        if !Queue.empty?(inventory) do
+          inventory |> populate_content_queue(contents, source)
+        end
     end
   end
 
