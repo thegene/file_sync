@@ -16,8 +16,16 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
     item |> source.contents.get(source.opts)
   end
 
+  defp get_data(nil, _source) do
+    {:ok, nil}
+  end
+
   defp validate(message, source) do
     message |> Validator.validate_with(source)
+  end
+
+  defp enqueue({:ok, nil}, _inventory_queue, _content_queue, _original_item) do
+    {:ok, "Inventory queue is empty"}
   end
 
   defp enqueue({:ok, file_data}, _inventory_queue, content_queue, _original_item) do

@@ -14,6 +14,7 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
   context "Given an inventory queue and content queue" do
     let inventory_queue: Queue.start_link([]) |> elem(1)
     let content_queue: Queue.start_link([]) |> elem(1)
+    let source: %Source{}
 
     let :passing_validator do
       DropBox.ContentHashValidator
@@ -35,8 +36,8 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
     end
 
     context "when an item is on the inventory queue" do
-      let item: %InventoryItem{path: "somewhere", name: "FooFile.png"}
       let source: %Source{contents: file_contents(), validators: validators()}
+      let item: %InventoryItem{path: "somewhere", name: "FooFile.png"}
 
       before do
         inventory_queue()
@@ -159,6 +160,21 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
             |> to(eq(true))
           end
         end
+      end
+    end
+
+    context "when inventory queue is empty" do
+      before do
+        message = inventory_queue()
+        |> QueueContentFromInventoryQueue.process(content_queue(), source())
+
+        {:shared, %{message: message}}
+      end
+
+      it "is ok but nil" do
+        shared.message
+        |> expect
+        |> to(eq({:ok, "Inventory queue is empty"}))
       end
     end
   end
