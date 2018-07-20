@@ -7,6 +7,10 @@ defmodule FileSync.Actions.Validator do
     |> validate(source.validators, source)
   end
 
+  defp validate(message = {:ok, nil}, _validators, _source = %Source{}) do
+    message
+  end
+
   defp validate(message = {:ok, _data}, [], _source = %Source{}) do
     message
   end

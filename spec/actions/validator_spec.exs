@@ -57,6 +57,17 @@ defmodule FileSync.Actions.ValidatorSpec do
           |> expect
           |> to(eq(message()))
         end
+
+        context "but a nil message" do
+          let message: {:ok, nil}
+
+          it "returns the message" do
+            subject()
+            |> expect
+            |> to(eq(message()))
+          end
+        end
+
       end
 
       context "which fails" do
