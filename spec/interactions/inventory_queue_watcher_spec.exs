@@ -3,9 +3,11 @@ defmodule FileSync.Interactions.InventoryQueueWatcherSpec do
 
   import Double
 
-  alias FileSync.Interactions.QueueContentFromInventoryQueue
-  alias FileSync.Interactions.InventoryQueueWatcher
-  alias FileSync.Interactions.Source
+  alias FileSync.Interactions.{
+    QueueContentFromInventoryQueue
+    InventoryQueueWatcher,
+    Source
+  }
 
   context "Given we want to check an inventory queue" do
     before do
