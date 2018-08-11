@@ -9,9 +9,21 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
     GenServer.start_link(__MODULE__, state)
   end
 
+  @impl true
   def init(state) do
     schedule()
     {:ok, state}
+  end
+
+  @impl true
+  def handle_info(:watch, state) do
+    check_queue(
+      state.inventory_queue,
+      state.content_queue,
+      state.source
+    )
+    schedule()
+    {:noreply, state}
   end
 
   defp build_state(inventory_queue, content_queue, source) do
@@ -25,16 +37,6 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
   defp schedule, do: Process.send_after(self(), :watch, delay())
 
   defp delay, do: 1000 * 10
-
-  def handle_info(:watch, state) do
-    check_queue(
-      state.inventory_queue,
-      state.content_queue,
-      state.source
-    )
-    schedule()
-    {:noreply, state}
-  end
 
   def check_queue(inventory_queue, content_queue, source, module \\ QueueContentFromInventoryQueue) do
     module.process(
