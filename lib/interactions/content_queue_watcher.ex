@@ -35,5 +35,7 @@ defmodule FileSync.Interactions.ContentQueueWatcher do
       state.content_queue,
       state.target
     )
+    schedule()
+    {:noreply, state}
   end
 end

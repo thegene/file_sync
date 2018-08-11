@@ -4,7 +4,7 @@ defmodule FileSync.Interactions.InventoryQueueWatcherSpec do
   import Double
 
   alias FileSync.Interactions.{
-    QueueContentFromInventoryQueue
+    QueueContentFromInventoryQueue,
     InventoryQueueWatcher,
     Source
   }

@@ -4,6 +4,7 @@ alias FileSync.Actions.Queue
 alias FileSync.Interactions.{
   Source,
   InventoryQueueWatcher,
+  ContentQueueWatcher,
   BuildInventoryQueue
 }
 
@@ -20,7 +21,22 @@ source = %Source{
   opts: %{folder: "Harrison Birth", limit: 3},
 }
 
-{:ok, watcher} = InventoryQueueWatcher.start_link(inventory_queue, item_queue, source)
+target = %Source{
+  contents: FileSystem.Contents,
+  validators: [FileSystem.FileSizeValidator],
+  opts: %{directory: "data"}
+}
+
+{:ok, inventory_watcher} = InventoryQueueWatcher.start_link(
+  inventory_queue,
+  item_queue,
+  source
+)
+
+{:ok, content_watcher} = ContentQueueWatcher.start_link(
+  item_queue,
+  target
+)
 
 DropBox.Inventory.get(%{folder: "Harrison Birth", limit: 3})
 |> elem(1)
