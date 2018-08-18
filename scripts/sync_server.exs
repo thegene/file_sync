@@ -2,7 +2,8 @@ require IEx
 
 alias FileSync.Interactions.{
   SyncServer,
-  Source
+  Source,
+  BuildInventoryQueue
 }
 
 alias FileSync.Boundaries.{
@@ -18,10 +19,18 @@ source = %Source{
 }
 
 target = %Source{
-  contents: FileSystem.Contents,
+  contents: FileSystem.FileContents,
   validators: [FileSystem.FileSizeValidator],
-  opts: %{directory: "data"}
+  opts: %FileSystem.Options{directory: "data"}
 }
 
 {:ok, server} = SyncServer.start_link(source: source, target: target)
+
+inventory_queue = FileSync.Actions.Queue.find_queue(:inventory)
+
+DropBox.Inventory.get(%{folder: "Harrison Birth", limit: 3})
+|> elem(1)
+|> BuildInventoryQueue.push_to_queue(inventory_queue)
+
+
 IEx.pry
