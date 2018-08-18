@@ -24,6 +24,7 @@ defmodule FileSync.Interactions.InventoryQueueWatcherSpec do
       Logger
       |> double
       |> allow(:warn, fn(_msg) -> nil end)
+      |> allow(:info, fn(_msg) -> nil end)
     end
 
     context "and the contained module successfully processes" do

@@ -1,13 +1,17 @@
 defmodule FileSync.Interactions.ContentQueueWatcher do
   use GenServer
 
+  alias FileSync.Actions.Queue
   alias FileSync.Interactions.{
     SaveContentQueueToInventory,
     Source
   }
 
-  def start_link(content_queue, target) do
-    state = %{content_queue: content_queue, target: target}
+  def start_link(content_queue: content_queue, target: target) do
+    state = %{
+      content_queue: Queue.find_queue(content_queue),
+      target: target
+    }
     GenServer.start_link(__MODULE__, state)
   end
 
@@ -41,7 +45,11 @@ defmodule FileSync.Interactions.ContentQueueWatcher do
 
   defp delay, do: 1000 * 10
 
-  def handle_response({_success, message}, logger) do
+  def handle_response({:error, message}, logger) do
     logger.warn(message)
+  end
+
+  def handle_response({:ok, message}, logger) do
+    logger.info(message)
   end
 end

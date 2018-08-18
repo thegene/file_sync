@@ -23,6 +23,7 @@ defmodule FileSync.Interactions.ContentQueueWatcherSpec do
       Logger
       |> double
       |> allow(:warn, fn(_msg) -> nil end)
+      |> allow(:info, fn(_msg) -> nil end)
     end
 
     context "and the contained module successfully processes" do
@@ -40,6 +41,10 @@ defmodule FileSync.Interactions.ContentQueueWatcherSpec do
           :mock_content_queue,
           %Source{}
         })
+      end
+
+      it "logs a success" do
+        assert_received({:info, "hooray"})
       end
     end
 

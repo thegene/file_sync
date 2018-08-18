@@ -3,6 +3,7 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
 
   alias FileSync.Interactions.QueueContentFromInventoryQueue
   alias FileSync.Data.FileData
+  alias FileSync.Actions.Queue
 
   def start_link(inventory_queue, content_queue, source) do
     state = build_state(inventory_queue, content_queue, source)
@@ -28,8 +29,8 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
 
   defp build_state(inventory_queue, content_queue, source) do
     %{
-      inventory_queue: inventory_queue,
-      content_queue: content_queue,
+      inventory_queue: Queue.find_queue(inventory_queue),
+      content_queue: Queue.find_queue(content_queue),
       source: source
     }
   end
@@ -38,7 +39,12 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
 
   defp delay, do: 1000 * 10
 
-  def check_queue(inventory_queue, content_queue, source, module \\ QueueContentFromInventoryQueue) do
+  def check_queue(
+    inventory_queue,
+    content_queue,
+    source,
+    module \\ QueueContentFromInventoryQueue
+  ) do
     module.process(
       inventory_queue,
       content_queue,
@@ -48,11 +54,11 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
   end
 
   defp handle_response({:ok, file_data = %FileData{}}, logger) do
-    logger.warn(file_data.name)
+    logger.info(file_data.name)
   end
 
   defp handle_response({:ok, message}, logger) do
-    logger.warn(message)
+    logger.info(message)
   end
 
   defp handle_response({:error, message}, logger) do
