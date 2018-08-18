@@ -10,7 +10,7 @@ defmodule FileSync.Interactions.SaveContentQueueToInventory do
   end
 
   defp save(nil, _source, _queue) do
-    {:ok, nil}
+    {:ok, "Nothing to save"}
   end
 
   defp save(item, source, queue) do

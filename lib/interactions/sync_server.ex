@@ -1,68 +1,65 @@
 defmodule FileSync.Interactions.SyncServer do
+  use Supervisor
+
+  require IEx
 
   alias FileSync.Actions.Queue
   alias FileSync.Interactions.{
     BuildInventoryQueue,
-    QueueContentFromInventoryQueue,
-    SaveContentQueueToInventory
+    ContentQueueWatcher,
+    InventoryQueueWatcher
   }
 
-  def sync(opts) do
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts, strategy: :one_for_one)
+  end
+
+  @impl true
+  def init(opts) do
+    build_map_from_opts(opts)
+    |> Supervisor.init(strategy: :one_for_one)
+  end
+
+  defp build_map_from_opts(opts) do
     source = opts |> Keyword.get(:source)
     target = opts |> Keyword.get(:target)
 
-    inventory = find_queue(source.queue_name)
-    contents = find_queue(target.queue_name)
-
-    source
-    |> get_inventory_items
-    |> populate_inventory_queue(inventory)
-    
-    inventory
-    |> populate_content_queue(contents, source)
-
-    contents
-    |> save_to_target(target)
+    [
+      inventory_queue_spec(source),
+      content_queue_spec(target),
+      {
+        InventoryQueueWatcher,
+        inventory_queue: :inventory,
+        content_queue: :content,
+        source: source
+      },
+      {
+        ContentQueueWatcher,
+        content_queue: :content,
+        target: target
+      }
+    ]
   end
 
-  defp save_to_target(content_queue, target) do
-    content_queue
-    |> SaveContentQueueToInventory.save_to(target)
+  defp inventory_queue_spec(source) do
+    %{
+      id: :inventory,
+      start: {
+        Queue,
+        :start_link,
+        [[name: source.queue_name || :inventory]]
+      }
+    }
   end
 
-  defp populate_content_queue(inventory, contents, source) do
-    {res, message} = QueueContentFromInventoryQueue.process(
-      inventory,
-      contents,
-      source
-    )
-
-    case res do
-      :error -> source.logger.warn(message)
-      :ok ->
-        if !Queue.empty?(inventory) do
-          inventory |> populate_content_queue(contents, source)
-        end
-    end
-  end
-
-  defp find_queue(name) do
-    Queue.find_queue(name) || new_queue(name)
-  end
-
-  defp new_queue(name) do
-   {:ok, queue} = Queue.start_link(agent: [name: name])
-   queue
-  end
-
-  defp get_inventory_items(source) do
-    source.inventory.get(source.opts)
-  end
-
-  defp populate_inventory_queue({:ok, items}, queue) do
-    BuildInventoryQueue.push_to_queue(items, queue)
-  end
-
-  defp populate_inventory_queue(_res, _queue) do
+  defp content_queue_spec(target) do
+    %{
+      id: :content,
+      start: {
+        Queue,
+        :start_link,
+        [[name: target.queue_name || :content]]
+      }
+    }
   end
 end

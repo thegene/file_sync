@@ -2,10 +2,14 @@ defmodule FileSync.Interactions.Logger do
   require Logger
 
   def warn(message) do
-    Logger.warn fn -> message end
+    Logger.warn(message)
   end
 
   def error(message) do
-    Logger.error fn -> message end
+    Logger.error(message)
+  end
+
+  def info(message) do
+    Logger.info(message)
   end
 end

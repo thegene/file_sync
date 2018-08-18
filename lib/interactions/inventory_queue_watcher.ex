@@ -5,7 +5,11 @@ defmodule FileSync.Interactions.InventoryQueueWatcher do
   alias FileSync.Data.FileData
   alias FileSync.Actions.Queue
 
-  def start_link(inventory_queue, content_queue, source) do
+  def start_link(
+    inventory_queue: inventory_queue,
+    content_queue: content_queue,
+    source: source
+  ) do
     state = build_state(inventory_queue, content_queue, source)
     GenServer.start_link(__MODULE__, state)
   end
