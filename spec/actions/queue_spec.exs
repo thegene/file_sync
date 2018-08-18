@@ -20,6 +20,13 @@ defmodule FileSync.Actions.QueueSpec do
       |> to(eq(nil))
     end
 
+    it "finds the queue if asked to" do
+      queue()
+      |> Queue.find_queue
+      |> expect
+      |> to(eq(queue()))
+    end
+
     context "when we add one thing to it" do
       before do: queue() |> Queue.push(thing())
 
@@ -132,7 +139,7 @@ defmodule FileSync.Actions.QueueSpec do
   end
 
   context "Given a named queue" do
-    let queue: Queue.start_link(agent: [name: :bar]) |> elem(1)
+    let queue: Queue.start_link(name: :bar) |> elem(1)
     let found_queue: Queue.find_queue(:bar)
 
     it "can be found by name" do

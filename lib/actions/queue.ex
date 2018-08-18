@@ -24,7 +24,7 @@ defmodule FileSync.Actions.Queue do
   end
 
   defp agent_opts(opts) do
-    opts |> Keyword.get(:agent, [])
+    opts |> Keyword.take([:name])
   end
 
   defp initial_value(opts) do
