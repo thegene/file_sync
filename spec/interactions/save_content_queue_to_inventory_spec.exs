@@ -60,7 +60,7 @@ defmodule FileSync.Interactions.SaveContentQueueToInventorySpec do
       it "responds with :ok but nil message" do
         shared.message
         |> expect
-        |> to(eq({:ok, nil}))
+        |> to(eq({:ok, "Nothing to save"}))
       end
     end
 
