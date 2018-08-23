@@ -45,25 +45,54 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
 
         let response_status_code: 200
 
-        it "has 200 status code" do
+        let :response do
           {:ok, response} = subject()
-          expect(response.status_code).to eq(200)
+          response
+        end
+
+        let :subject_body do
+          response().body
+        end
+
+        it "has 200 status code" do
+          expect(response().status_code).to eq(200)
         end
 
         it "makes headers available" do
-          {:ok, response} = subject()
-          response.headers["x-dropbox-request-id"]
+          response().headers["x-dropbox-request-id"]
           |> expect
           |> to(eq("8711e060f291f386b39a3890cbce15b2"))
         end
 
         it "has entries in the response body" do
-          {:ok, response} = subject()
-          response.body
+          subject_body()
           |> Map.get(:entries)
           |> length
           |> expect
           |> to(eq(21))
+        end
+
+        it "includes the cursor" do
+          subject_body()
+          |> Map.get(:cursor)
+          |> expect
+          |> to(eq(
+                "AAGKi6Ov0v3qtMPipH-" <>
+                "P8Xcn6Hsp-" <>
+                "nZVeZIpx3bPqA1nAwD5nAfHOBFZ9tzdCn4vNM1I9La1o_-" <>
+                "RQu7xdCj26e-" <>
+                "XgYUChQAPVL99PO3uw2VnC5Uy-" <>
+                "OhFkvgdcG7YUl6McBU7YccDnn1Ath573UTT11-" <>
+                "VPaH2CkM0OxGiDVww0VFNmd8VVgK3HBERsLBTcQqSWh6dbiC-" <>
+                "Af5JRsZVXbdudbwY"
+              ))
+        end
+
+        it "indicates if there are more available pages" do
+          subject_body()
+          |> Map.get(:has_more)
+          |> expect
+          |> to(eq(false))
         end
       end
 

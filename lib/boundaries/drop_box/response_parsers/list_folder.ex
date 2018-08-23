@@ -12,7 +12,9 @@ defmodule FileSync.Boundaries.DropBox.ResponseParsers.ListFolder do
 
   defp build_response_body(body) do
     %{
-      entries: body["entries"]
+      entries: body["entries"],
+      cursor: body["cursor"],
+      has_more: body["has_more"]
     }
   end
 end
