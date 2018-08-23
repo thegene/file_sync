@@ -47,25 +47,39 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       end
     end
 
-    context "optional params" do
-      let params: %{folder: "foo_bar", limit: 5}
+    context "when passed optional params" do
 
-      let :expected, do:
-        %{
-          "path": "/foo_bar",
-          "recursive": false,
-          "include_media_info": false,
-          "include_deleted": false,
-          "include_has_explicit_shared_members": false,
-          "include_mounted_folders": true,
-          "limit": 5
-        }
+      let :params do
+        required_params()
+        |> Map.merge(optional_params())
+      end
 
-      it "makes limit available" do
-        endpoint()
-        |> ListFolder.body
-        |> expect
-        |> to(eq(expected_payload()))
+      let required_params: %{folder: "foo_bar"}
+
+      context "including limit" do
+        let optional_params: %{limit: 5}
+
+        it "makes limit available" do
+          endpoint()
+          |> ListFolder.body
+          |> Poison.decode!
+          |> Map.get("limit")
+          |> expect
+          |> to(eq(5))
+        end
+      end
+
+      context "including cursor" do
+        let optional_params: %{cursor: "ABCdefg"}
+
+        it "includes cursor" do
+          endpoint()
+          |> ListFolder.body
+          |> Poison.decode!
+          |> Map.get("cursor")
+          |> expect
+          |> to(eq("ABCdefg"))
+        end
       end
     end
   end

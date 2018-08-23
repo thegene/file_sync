@@ -55,5 +55,5 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     params |> Map.merge(optional)
   end
 
-  defp optional_params, do: [:limit]
+  defp optional_params, do: [:limit, :cursor]
 end
