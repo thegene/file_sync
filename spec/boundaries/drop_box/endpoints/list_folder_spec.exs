@@ -59,7 +59,7 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       context "including limit" do
         let optional_params: %{limit: 5}
 
-        it "makes limit available" do
+        it "includes limit in the body json" do
           endpoint()
           |> ListFolder.body
           |> Poison.decode!
@@ -72,13 +72,20 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       context "including cursor" do
         let optional_params: %{cursor: "ABCdefg"}
 
-        it "includes cursor" do
+        it "includes cursor in the body json" do
           endpoint()
           |> ListFolder.body
           |> Poison.decode!
           |> Map.get("cursor")
           |> expect
           |> to(eq("ABCdefg"))
+        end
+
+        it "changes the url to continue" do
+          endpoint()
+          |> ListFolder.url
+          |> expect
+          |> to(eq("https://api.dropboxapi.com/2/files/list_folder/continue"))
         end
       end
     end

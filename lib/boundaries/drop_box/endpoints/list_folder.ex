@@ -33,6 +33,10 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     |> Poison.encode!
   end
 
+  def url(%ListFolder{optional_params: %{cursor: _cursor}}) do
+    "https://api.dropboxapi.com/2/files/list_folder/continue"
+  end
+
   def url(_) do
     "https://api.dropboxapi.com/2/files/list_folder"
   end
