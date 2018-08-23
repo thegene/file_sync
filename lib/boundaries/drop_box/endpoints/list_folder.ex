@@ -12,6 +12,11 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     strategy: ListFolder
   ]
 
+  def body(%ListFolder{optional_params: %{cursor: cursor}}) do
+    %{cursor: cursor}
+    |> Poison.encode!
+  end
+
   def body(%ListFolder{
       folder: folder,
       recursive: recursive,

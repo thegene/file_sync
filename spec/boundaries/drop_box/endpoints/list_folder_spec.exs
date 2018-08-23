@@ -72,13 +72,12 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
       context "including cursor" do
         let optional_params: %{cursor: "ABCdefg"}
 
-        it "includes cursor in the body json" do
+        it "includes only cursor in the body json" do
           endpoint()
           |> ListFolder.body
           |> Poison.decode!
-          |> Map.get("cursor")
           |> expect
-          |> to(eq("ABCdefg"))
+          |> to(eq(%{"cursor" => "ABCdefg"}))
         end
 
         it "changes the url to continue" do
