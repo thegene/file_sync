@@ -39,6 +39,10 @@ defmodule FileSync.Boundaries.DropBox.Client do
     {:error, body |> Poison.decode! |> Map.get("error_summary")}
   end
 
+  defp handle_response({:ok, %{status_code: 400, body: body}}, _parser) do
+    {:error, body}
+  end
+
   defp handle_response({:ok, response}, parser) do
     {:ok, response |> parser.parse }
   end

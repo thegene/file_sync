@@ -324,6 +324,29 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
           expect(message).to eq("request timed out")
         end
       end
+
+      context "which returns a 400" do
+        let :response_body do
+          "Error in call to API function " <>
+          "\"files/list_folder/continue\": Invalid \"cursor\" parameter: 'foo'"
+        end
+
+        let response_status_code: 400
+
+        let :response_headers, do:
+          [{"Content-Disposition", "attachment; filename='error'"}]
+
+        it "results in an error message" do
+          {:error, message} = subject()
+          message
+          |> expect
+          |> to(eq(
+            "Error in call to API function " <>
+            "\"files/list_folder/continue\": " <>
+            "Invalid \"cursor\" parameter: 'foo'"
+          ))
+        end
+      end
     end
   end
 end
