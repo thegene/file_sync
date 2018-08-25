@@ -205,5 +205,125 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
         end
       end
     end
+
+    context "when we make a list_folder_continue request" do
+      let :subject do
+        Client.list_folder_continue(%{
+                                      cursor: "foo",
+                                      api: mock_api()
+                                    })
+      end
+
+      context "which is successful" do
+        let :fixtures_path, do:
+          Path.join([
+            "spec",
+            "fixtures",
+            "boundaries",
+            "drop_box",
+            "list_folder_small.json"
+          ])
+
+        let :response_body, do:
+          fixtures_path()
+          |> File.read!
+          |> Poison.decode!
+          |> Map.get("body")
+
+        let :response_headers, do:
+          [
+            {"Server", "nginx"},
+            {"x-dropbox-request-id", "8711e060f291f386b39a3890cbce15b2"},
+            {"Other stuff", "blah"}
+          ]
+
+        let response_status_code: 200
+
+        let :response do
+          {:ok, response} = subject()
+          response
+        end
+
+        let :subject_body do
+          response().body
+        end
+
+        it "has 200 status code" do
+          expect(response().status_code).to eq(200)
+        end
+
+        it "makes headers available" do
+          response().headers["x-dropbox-request-id"]
+          |> expect
+          |> to(eq("8711e060f291f386b39a3890cbce15b2"))
+        end
+
+        it "has entries in the response body" do
+          subject_body()
+          |> Map.get(:entries)
+          |> length
+          |> expect
+          |> to(eq(21))
+        end
+
+        it "includes the cursor" do
+          subject_body()
+          |> Map.get(:cursor)
+          |> expect
+          |> to(eq(
+                "AAGKi6Ov0v3qtMPipH-" <>
+                "P8Xcn6Hsp-" <>
+                "nZVeZIpx3bPqA1nAwD5nAfHOBFZ9tzdCn4vNM1I9La1o_-" <>
+                "RQu7xdCj26e-" <>
+                "XgYUChQAPVL99PO3uw2VnC5Uy-" <>
+                "OhFkvgdcG7YUl6McBU7YccDnn1Ath573UTT11-" <>
+                "VPaH2CkM0OxGiDVww0VFNmd8VVgK3HBERsLBTcQqSWh6dbiC-" <>
+                "Af5JRsZVXbdudbwY"
+              ))
+        end
+
+        it "indicates if there are more available pages" do
+          subject_body()
+          |> Map.get(:has_more)
+          |> expect
+          |> to(eq(false))
+        end
+      end
+
+      context "which returns a drop box error" do
+        let :response_body, do:
+          %{
+            "error_summary": "path/not_found/.",
+            "error": %{
+                ".tag": "path",
+                "path": %{".tag": "not_found"}
+            }
+          } |> Poison.encode!
+
+        let :response_headers, do:
+          [{"Content-Disposition", "attachment; filename='error'"}]
+
+        let response_status_code: 409
+
+        it "results in an error message" do
+          {:error, message} = subject()
+          expect(message).to eq("path/not_found/.")
+        end
+      end
+
+      context "which times out" do
+        let :mock_api, do:
+          HttpApi
+          |> double
+          |> allow(:post, fn(_) ->
+            {:error, %HTTPoison.Error{id: nil, reason: :connect_timeout}}
+          end)
+
+        it "results in an error message" do
+          {:error, message} = subject()
+          expect(message).to eq("request timed out")
+        end
+      end
+    end
   end
 end

@@ -1,12 +1,24 @@
 defmodule FileSync.Boundaries.DropBox.Client do
   alias FileSync.Boundaries.DropBox.HttpApi
-  alias FileSync.Boundaries.DropBox.Endpoints.{ListFolder,Download}
+  alias FileSync.Boundaries.DropBox.Endpoints.{
+    ListFolder,
+    ListFolderContinue,
+    Download
+  }
   alias FileSync.Boundaries.DropBox.ResponseParsers
 
   def list_folder(opts) do
     opts
     |> set_defaults
     |> inject_endpoint(ListFolder)
+    |> post
+    |> handle_response(ResponseParsers.ListFolder)
+  end
+
+  def list_folder_continue(opts) do
+    opts
+    |> set_defaults
+    |> inject_endpoint(ListFolderContinue)
     |> post
     |> handle_response(ResponseParsers.ListFolder)
   end

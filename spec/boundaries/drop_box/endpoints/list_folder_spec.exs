@@ -68,25 +68,6 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolderSpec do
           |> to(eq(5))
         end
       end
-
-      context "including cursor" do
-        let optional_params: %{cursor: "ABCdefg"}
-
-        it "includes only cursor in the body json" do
-          endpoint()
-          |> ListFolder.body
-          |> Poison.decode!
-          |> expect
-          |> to(eq(%{"cursor" => "ABCdefg"}))
-        end
-
-        it "changes the url to continue" do
-          endpoint()
-          |> ListFolder.url
-          |> expect
-          |> to(eq("https://api.dropboxapi.com/2/files/list_folder/continue"))
-        end
-      end
     end
   end
 end

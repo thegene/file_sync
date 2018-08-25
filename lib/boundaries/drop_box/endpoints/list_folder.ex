@@ -12,11 +12,6 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     strategy: ListFolder
   ]
 
-  def body(%ListFolder{optional_params: %{cursor: cursor}}) do
-    %{cursor: cursor}
-    |> Poison.encode!
-  end
-
   def body(%ListFolder{
       folder: folder,
       recursive: recursive,
@@ -36,10 +31,6 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     }
     |> merge_optional(optional_params)
     |> Poison.encode!
-  end
-
-  def url(%ListFolder{optional_params: %{cursor: _cursor}}) do
-    "https://api.dropboxapi.com/2/files/list_folder/continue"
   end
 
   def url(_) do
@@ -64,5 +55,5 @@ defmodule FileSync.Boundaries.DropBox.Endpoints.ListFolder do
     params |> Map.merge(optional)
   end
 
-  defp optional_params, do: [:limit, :cursor]
+  defp optional_params, do: [:limit]
 end
