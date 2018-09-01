@@ -3,9 +3,9 @@ defmodule FileSync.Interactions.SyncStrategyPoller do
   
   def poll(source = %Source{}, strategy, queue) do
     strategy.check(
-      source: source,
-      queue: queue,
-      last_response: %{}
+      %{},
+      source,
+      queue
     )
   end
 end

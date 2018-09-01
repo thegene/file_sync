@@ -7,14 +7,12 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
     Response
   }
   
-  def check(opts) do
-    with_defaults = opts |> Enum.into(%{client: Client})
-
-    list_folder(with_defaults)
-    |> handle_response(with_defaults)
+  def check(last_response, source = %Source{}, queue, client \\ Client) do
+    list_folder(client: client, source: source)
+    |> handle_response(queue)
   end
 
-  defp list_folder(%{client: client, source: %Source{opts: source_opts}}) do
+  defp list_folder(client: client, source: %Source{opts: source_opts}) do
     %{
       folder: source_opts[:folder],
       limit: source_opts[:limit] || 100
@@ -22,7 +20,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
     |> client.list_folder
   end
 
-  defp handle_response({:ok, %Response{body: body}}, %{queue: queue}) do
+  defp handle_response({:ok, %Response{body: body}}, queue) do
     body[:entries]
     |> Enum.each(fn(item) -> queue |> Queue.push(item) end)
 
@@ -32,7 +30,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
     }}
   end
 
-  defp handle_response({:error, message}, _defaults) do
+  defp handle_response({:error, message}, _queue) do
     {:error, message}
   end
 end

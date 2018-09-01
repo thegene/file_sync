@@ -14,7 +14,11 @@ defmodule FileSync.Interactions.SyncStrategyPollerSpec do
     let :mock_strategy do
       Paginate
       |> double
-      |> allow(:check, fn(_anything) -> {:ok, "foobar"} end
+      |> allow(:check, fn(
+          _last_response,
+          _source,
+          _queue
+        ) -> {:ok, "foobar"} end
        )
     end
 
@@ -25,7 +29,12 @@ defmodule FileSync.Interactions.SyncStrategyPollerSpec do
     it "checks the source with the given strategy" do
       SyncStrategyPoller.poll(source(), mock_strategy(), queue())
 
-      assert_received({:check})
+      assert_received({
+        :check,
+        %{},
+        %Source{},
+        _queue_pid
+      })
     end
   end
 end

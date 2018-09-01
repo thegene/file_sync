@@ -13,11 +13,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
 
   context "Given we are checking for DropBox inventory" do
     let :check do
-      Paginate.check(
-        source: source(),
-        last_response: last_response(),
-        client: mock_client(),
-        queue: queue()
+      last_response()
+      |> Paginate.check(
+        source(),
+        queue(),
+        mock_client()
       )
     end
 
