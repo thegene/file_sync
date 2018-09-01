@@ -53,18 +53,6 @@ defmodule FileSync.Interactions.SyncServerSpec do
       |> allow(:info, fn(_) -> nil end)
     end
 
-    let :failing_validator do
-      FileSystem.FileSizeValidator
-      |> double
-      |> allow(:valid?, fn(_data, _source) -> {:error, "ka-bork"} end)
-    end
-
-    let :passing_validator do
-      DropBox.ContentHashValidator
-      |> double
-      |> allow(:valid?, fn(data, _source) -> {:ok, data} end)
-    end
-
     let source_validators: []
     let target_validators: []
 
