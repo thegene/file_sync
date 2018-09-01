@@ -1,4 +1,4 @@
-defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateAndPoll do
+defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
 
   alias FileSync.Interactions.Source
   alias FileSync.Actions.Queue

@@ -1,11 +1,11 @@
-defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateAndPollSpec do
+defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
   use ESpec
 
   import Double
 
   alias FileSync.Interactions.Source
   alias FileSync.Actions.Queue
-  alias FileSync.Boundaries.DropBox.SyncStrategies.PaginateAndPoll
+  alias FileSync.Boundaries.DropBox.SyncStrategies.Paginate
   alias FileSync.Boundaries.DropBox.{
     Client,
     Response
@@ -13,7 +13,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateAndPollSpec do
 
   context "Given we are checking for DropBox inventory" do
     let :check do
-      PaginateAndPoll.check(
+      Paginate.check(
         source: source(),
         last_response: last_response(),
         client: mock_client(),
