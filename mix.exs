@@ -24,7 +24,7 @@ defmodule FileSync.Mixfile do
   defp deps do
     [
       {:espec, "~> 1.5.0", only: :test},
-      {:double, "~> 0.6.2", only: :test},
+      {:double, "~> 0.6.5", only: :test},
       {:httpoison, "~> 0.13"},
       {:poison, "~> 3.1"}
     ]
