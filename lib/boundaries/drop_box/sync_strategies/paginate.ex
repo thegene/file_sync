@@ -7,7 +7,15 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
     Response
   }
   
-  def check(last_response, source = %Source{}, queue, client \\ Client) do
+  def check(last_response, source, queue, client \\ Client)
+
+  def check(%{cursor: cursor}, source = %Source{}, queue, client) do
+    %{cursor: cursor}
+    |> client.list_folder_continue
+    |> handle_response(queue)
+  end
+
+  def check(_last_response, source = %Source{}, queue, client) do
     list_folder(client: client, source: source)
     |> handle_response(queue)
   end

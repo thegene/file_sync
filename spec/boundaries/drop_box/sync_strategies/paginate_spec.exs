@@ -32,24 +32,35 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
       }
     end
 
+    let :mock_client do
+      Client
+      |> double
+      |> allow(:list_folder, fn(%{folder: "foo", limit: 5}) ->
+        {:ok,  %Response{
+            body: %{
+              entries: ["foo", "bar"],
+              cursor: "ABC",
+              has_more: false
+            }
+          }
+        }
+      end)
+      |> allow(:list_folder_continue, fn(%{cursor: "ABC"}) ->
+        {:ok, %Response{
+            body: %{
+              entries: ["foo", "bar"],
+              cursor: "ABC",
+              has_more: false
+            }
+          }
+        }
+      end)
+    end
+
     context "with no data" do
       let last_response: %{}
 
       context "and the request is successful" do
-        let :mock_client do
-          Client
-          |> double
-          |> allow(:list_folder, fn(%{folder: "foo", limit: 5}) ->
-            {:ok,  %Response{
-                body: %{
-                  entries: ["foo", "bar"],
-                  cursor: "ABC",
-                  has_more: false
-                }
-              }
-            }
-          end)
-        end
 
         it "requests a list of a folder from the client" do
           check()
@@ -103,6 +114,21 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
           |> to(eq({:error, "Path not found"}))
         end
       end
+    end
+
+    context "with a last response that has_more" do
+      let :last_response do
+        %{
+          cursor: "ABC",
+          has_more: true
+        }
+      end
+
+      it "requests a continue on list_folder with the cursor" do
+        check()
+        assert_received({:list_folder_continue, %{cursor: "ABC"}})
+      end
+
     end
   end
 end
