@@ -8,27 +8,24 @@ defmodule FileSync.Boundaries.DropBox.Client do
   alias FileSync.Boundaries.DropBox.ResponseParsers
 
   def list_folder(opts) do
-    opts
-    |> set_defaults
-    |> inject_endpoint(ListFolder)
-    |> post
-    |> handle_response(ResponseParsers.ListFolder)
+    request(opts, ListFolder, ResponseParsers.ListFolder)
   end
 
   def list_folder_continue(opts) do
-    opts
-    |> set_defaults
-    |> inject_endpoint(ListFolderContinue)
-    |> post
-    |> handle_response(ResponseParsers.ListFolder)
+    request(opts, ListFolderContinue, ResponseParsers.ListFolder)
   end
 
   def download(opts) do
+    request(opts, Download, ResponseParsers.Download)
+  end
+
+  defp request(opts, endpoint, parser) do
     opts
     |> set_defaults
-    |> inject_endpoint(Download)
+    |> inject_endpoint(endpoint)
+    |> inject_token
     |> post
-    |> handle_response(ResponseParsers.Download)
+    |> handle_response(parser)
   end
 
   defp handle_response({:error, %{reason: :connect_timeout}}, _parser) do
@@ -53,6 +50,11 @@ defmodule FileSync.Boundaries.DropBox.Client do
 
   defp inject_endpoint(opts, endpoint) do
     Map.merge(opts, %{endpoint: endpoint.build_endpoint(opts)})
+  end
+
+  defp inject_token(opts) do
+    require IEx
+    IEx.pry
   end
 
   defp set_defaults(opts) do

@@ -9,7 +9,7 @@ defmodule FileSync.Boundaries.DropBox.ClientSpec do
     let :mock_api, do:
       HttpApi
       |> double
-      |> allow(:post, fn(%{endpoint: _}) ->
+      |> allow(:post, fn(%{endpoint: _, token: _}) ->
         {:ok, %{
           body: response_body(),
           headers: response_headers(),
