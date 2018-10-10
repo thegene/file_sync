@@ -2,7 +2,6 @@ defmodule FileSync.Boundaries.DropBox.ResponseParsers.Download do
   
   alias FileSync.Boundaries.DropBox.Response
 
-  require IEx
   def parse(%{status_code: 200, headers: headers, body: body}) do
     %Response{
       status_code: 200,

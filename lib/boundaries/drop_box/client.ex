@@ -19,7 +19,7 @@ defmodule FileSync.Boundaries.DropBox.Client do
     request(opts, Download, ResponseParsers.Download)
   end
 
-  defp request(opts, endpoint, parser) do
+  def request(opts, endpoint, parser) do
     opts
     |> set_defaults
     |> inject_endpoint(endpoint)
@@ -44,17 +44,18 @@ defmodule FileSync.Boundaries.DropBox.Client do
     {:ok, response |> parser.parse }
   end
 
-  defp post(%{endpoint: endpoint, api: api}) do
-    api.post(%{endpoint: endpoint})
+  defp post(opts) do
+    opts
+    |> Map.take([:endpoint, :token])
+    |> opts.api.post
   end
 
   defp inject_endpoint(opts, endpoint) do
     Map.merge(opts, %{endpoint: endpoint.build_endpoint(opts)})
   end
 
-  defp inject_token(opts) do
-    require IEx
-    IEx.pry
+  defp inject_token(opts = %{token: _token}) do
+    opts
   end
 
   defp set_defaults(opts) do
