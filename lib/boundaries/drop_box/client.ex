@@ -7,18 +7,6 @@ defmodule FileSync.Boundaries.DropBox.Client do
   }
   alias FileSync.Boundaries.DropBox.ResponseParsers
 
-  def list_folder(opts) do
-    request(opts, ListFolder, ResponseParsers.ListFolder)
-  end
-
-  def list_folder_continue(opts) do
-    request(opts, ListFolderContinue, ResponseParsers.ListFolder)
-  end
-
-  def download(opts) do
-    request(opts, Download, ResponseParsers.Download)
-  end
-
   def request(opts, endpoint, parser) do
     opts
     |> set_defaults
