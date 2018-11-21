@@ -1,10 +1,18 @@
 defmodule FileSync.Boundaries.DropBox.Inventory do
 
-  alias FileSync.Boundaries.DropBox.Client
+  alias FileSync.Boundaries.DropBox.{
+    Client,
+    Endpoints,
+    ResponseParsers
+  }
 
   def get(opts) do
+    endpoint = Endpoints.ListFolder
+    parser = ResponseParsers.ListFolder
+    client = find_client(opts)
+
     opts
-    |> find_client(opts).list_folder
+    |> client.request(endpoint, parser)
     |> parse
   end
 
