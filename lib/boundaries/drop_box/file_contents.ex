@@ -3,14 +3,24 @@ defmodule FileSync.Boundaries.DropBox.FileContents do
   require IEx
 
   alias FileSync.Data.{FileData,InventoryItem,InventoryFolder}
-  alias FileSync.Boundaries.DropBox.{Client,SourceMeta}
+  alias FileSync.Boundaries.DropBox.{
+    Client,
+    SourceMeta,
+    Endpoints,
+    ResponseParsers
+  }
 
   def get(item, opts \\ %{})
   def get(%InventoryItem{path: path}, opts) do
 
     client = Map.get(opts, :client, Client)
 
-    client.download(%{path: path})
+    endpoint = Endpoints.Download
+    parser = ResponseParsers.Download
+
+    opts
+    |> Map.merge(%{path: path})
+    |> client.request(endpoint, parser)
     |> respond
   end
 

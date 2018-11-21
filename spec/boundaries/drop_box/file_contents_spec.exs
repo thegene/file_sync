@@ -2,15 +2,21 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
   use ESpec
   require IEx
 
-  alias FileSync.Boundaries.DropBox.{FileContents,Client,Response}
+  alias FileSync.Boundaries.DropBox.{
+    FileContents,
+    Client,
+    Response,
+    ResponseParsers,
+    Endpoints
+  }
   alias FileSync.Data.InventoryItem
 
   import Double
 
   context "Given a request for file contents of an InventoryItem" do
     let item: %InventoryItem{path: "foo.txt"}
-    let subject: FileContents.get(item(), dependencies())
-    let dependencies: %{client: mock_client()}
+    let subject: FileContents.get(item(), opts())
+    let opts: %{client: mock_client(), token: "bar"}
 
     context "when successful" do
       let :response_body, do:
@@ -40,7 +46,10 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
       let :mock_client, do:
         Client
         |> double
-        |> allow(:download, fn(%{path: _path}) ->
+        |> allow(:request, fn(
+                   %{token: "bar", path: "foo.txt"},
+                   Endpoints.Download,
+                   ResponseParsers.Download) ->
           {:ok, %Response{body: response_body(), headers: response_headers()}}
         end)
 
@@ -70,7 +79,7 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
       let :mock_client, do:
         Client
         |> double
-        |> allow(:download, fn(_) -> {:error, "Some error message"} end)
+        |> allow(:request, fn(_, _, _) -> {:error, "Some error message"} end)
 
       it "passes the error state along" do
         {:error, message} = subject()
