@@ -24,8 +24,8 @@ defmodule FileSync.Boundaries.DropBox.InventorySpec do
                  %{token: "bar", folder: "foo"},
                  Endpoints.ListFolder,
                  ResponseParsers.ListFolder) ->
-        {:ok, %Response{body: %{entries: folder_contents()}}}
-      end)
+          {:ok, %Response{body: %{entries: folder_contents()}}}
+        end)
       |> allow(:request, fn(_, _, _) ->
         {:error, "something borked"}
       end)
