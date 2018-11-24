@@ -8,7 +8,9 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
   alias FileSync.Boundaries.DropBox.SyncStrategies.Paginate
   alias FileSync.Boundaries.DropBox.{
     Client,
-    Response
+    Response,
+    Endpoints,
+    ResponseParsers
   }
 
   context "Given we are checking for DropBox inventory" do
@@ -27,15 +29,20 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
       %Source{
         opts: %{
           folder: "foo",
-          limit: 5
-        }
+          limit: 5,
+          token: "bar"
+        },
       }
     end
 
     let :mock_client do
       Client
       |> double
-      |> allow(:list_folder, fn(%{folder: "foo", limit: 5}) ->
+      |> allow(:request, fn(
+                 %{folder: "foo", limit: 5, token: "bar"},
+                 Endpoints.ListFolder,
+                 ResponseParsers.ListFolder
+               ) ->
         {:ok,  %Response{
             body: %{
               entries: ["foo", "bar"],
@@ -45,7 +52,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
           }
         }
       end)
-      |> allow(:list_folder_continue, fn(%{cursor: "ABC"}) ->
+      |> allow(:request, fn(
+                 %{cursor: "ABC", token: "bar"},
+                 Endpoints.ListFolderContinue,
+                 ResponseParsers.ListFolder
+               ) ->
         {:ok, %Response{
             body: %{
               entries: ["foo", "bar"],
@@ -64,7 +75,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
 
         it "requests a list of a folder from the client" do
           check()
-          assert_received({:list_folder, %{folder: "foo", limit: 5}})
+          assert_received({:request,
+                          %{folder: "foo", limit: 5, token: "bar"},
+                          Endpoints.ListFolder,
+                          ResponseParsers.ListFolder
+                        })
         end
 
         it "returns the cursor and has_more boolean" do
@@ -95,7 +110,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
         let :mock_client do
           Client
           |> double
-          |> allow(:list_folder, fn(%{folder: "foo", limit: 5}) ->
+          |> allow(:request, fn(_opts, _endpoint, _parser) ->
             {:error, "Path not found"}
           end)
         end
@@ -126,7 +141,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
 
       it "requests a continue on list_folder with the cursor" do
         check()
-        assert_received({:list_folder_continue, %{cursor: "ABC"}})
+        assert_received({:request,
+                        %{cursor: "ABC", token: "bar"},
+                        Endpoints.ListFolderContinue,
+                        ResponseParsers.ListFolder
+                      })
       end
 
     end

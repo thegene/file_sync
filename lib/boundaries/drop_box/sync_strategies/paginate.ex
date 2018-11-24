@@ -4,14 +4,17 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
   alias FileSync.Actions.Queue
   alias FileSync.Boundaries.DropBox.{
     Client,
-    Response
+    Response,
+    Endpoints,
+    ResponseParsers
   }
   
   def check(last_response, source, queue, client \\ Client)
 
-  def check(%{cursor: cursor}, source = %Source{}, queue, client) do
+  def check(%{cursor: cursor}, %Source{opts: %{token: token}}, queue, client) do
     %{cursor: cursor}
-    |> client.list_folder_continue
+    |> Map.merge(%{token: token})
+    |> client.request(Endpoints.ListFolderContinue, ResponseParsers.ListFolder)
     |> handle_response(queue)
   end
 
@@ -23,9 +26,10 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
   defp list_folder(client: client, source: %Source{opts: source_opts}) do
     %{
       folder: source_opts[:folder],
-      limit: source_opts[:limit] || 100
+      limit: source_opts[:limit] || 100,
+      token: source_opts[:token]
     }
-    |> client.list_folder
+    |> client.request(Endpoints.ListFolder, ResponseParsers.ListFolder)
   end
 
   defp handle_response({:ok, %Response{body: body}}, queue) do
