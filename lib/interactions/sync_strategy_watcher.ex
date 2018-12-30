@@ -34,7 +34,7 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
 
   defp schedule, do: Process.send_after(self(), :poll, delay())
 
-  defp delay, do: 1000 * 60 * 5
+  defp delay, do: 1000 * 60 * 60
 
   def poll({:ok, last_response}, source = %Source{}, queue) do
     heartbeat_log(source)
