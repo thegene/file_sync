@@ -1,16 +1,16 @@
 defmodule FileSync.Interactions.SyncStrategyWatcher do
   alias FileSync.Interactions.Source
   
-  def poll({:ok, last_response}, source = %Source{}, strategy, queue) do
-    strategy.check(
+  def poll({:ok, last_response}, source = %Source{}, queue) do
+    source.strategy.check(
       last_response,
       source,
       queue
     ) |> handle_response(source)
   end
 
-  def poll(_last_response, source = %Source{}, strategy, queue) do
-    strategy.check(
+  def poll(_last_response, source = %Source{}, queue) do
+    source.strategy.check(
       %{},
       source,
       queue
