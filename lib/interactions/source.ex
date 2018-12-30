@@ -7,6 +7,7 @@ defmodule FileSync.Interactions.Source do
     :opts, # opts to pass to modules used
     :validators, # validators to use on fetched file contents
     :queue_name, # the name of the queue to be used
+    :strategy, # The sync strategy to build the inventory queue out with
     logger: FileSync.Interactions.Logger
   ]
 end

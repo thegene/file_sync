@@ -9,7 +9,13 @@ defmodule FileSync.Interactions.SyncServerSpec do
   import Double
 
   context "Given a source and a target source" do
-    let subject: SyncServer.start_link(source: source(), target: target()) |> elem(1)
+    let :subject do
+      SyncServer.start_link(
+                            source: source(),
+                            target: target()
+                          ) |> elem(1)
+    end
+
     let children: subject() |> Supervisor.which_children
 
     let source: %Source{
@@ -18,7 +24,8 @@ defmodule FileSync.Interactions.SyncServerSpec do
       contents: mock_db_contents(),
       validators: source_validators(),
       queue_name: :source_queue,
-      logger: mock_logger()
+      logger: mock_logger(),
+      strategy: mock_strategy()
     }
 
     let target: %Source{
@@ -53,14 +60,20 @@ defmodule FileSync.Interactions.SyncServerSpec do
       |> allow(:info, fn(_) -> nil end)
     end
 
+    let :mock_strategy do
+      DropBox.SyncStrategies.Paginate
+      |> double
+      |> allow(:check, fn(_response, _source, _queue, _client) -> {} end)
+    end
+
     let source_validators: []
     let target_validators: []
 
-    it "monitors four children" do
+    it "monitors five children" do
       children()
       |> length
       |> expect
-      |> to(eq(4))
+      |> to(eq(5))
     end
   end
 end
