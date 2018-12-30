@@ -6,7 +6,7 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
   
   def start_link(inventory_queue: queue_name, source: source) do
     state = %{
-      queue: Queue: find_queue(queue_name),
+      queue: Queue.find_queue(queue_name),
       source: source,
       last_response: %{}
     }
@@ -27,7 +27,7 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
       state.queue
     )
 
-    {:noreply, state |> Map.merge({last_response: last_response})}
+    {:noreply, state |> Map.merge(%{last_response: last_response})}
   end
 
   defp schedule, do: Process.send_after(self(), :poll, delay())
@@ -35,6 +35,7 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
   defp delay, do: 1000 * 60 * 5
 
   def poll({:ok, last_response}, source = %Source{}, queue) do
+    heartbeat_log(source)
     source.strategy.check(
       last_response,
       source,
@@ -43,11 +44,16 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
   end
 
   def poll(_last_response, source = %Source{}, queue) do
+    heartbeat_log(source)
     source.strategy.check(
       %{},
       source,
       queue
     ) |> handle_response(source)
+  end
+
+  defp heartbeat_log(%Source{logger: logger}) do
+    logger.info("Watching for new files to sync")
   end
 
   defp handle_response(last_response = {:ok, _anything}, _source) do

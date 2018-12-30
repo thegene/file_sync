@@ -50,6 +50,13 @@ defmodule FileSync.Interactions.SyncStrategyWatcherSpec do
         })
       end
 
+      it "logs that it is doing something" do
+        assert_received({
+          :info,
+          "Watching for new files to sync"
+        })
+      end
+
       context "when passed the response from the first call" do
         let :last_response do
           SyncStrategyWatcher.poll(%{}, source(), queue())
