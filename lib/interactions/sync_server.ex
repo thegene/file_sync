@@ -5,9 +5,9 @@ defmodule FileSync.Interactions.SyncServer do
 
   alias FileSync.Actions.Queue
   alias FileSync.Interactions.{
-    BuildInventoryQueue,
     ContentQueueWatcher,
-    InventoryQueueWatcher
+    InventoryQueueWatcher,
+    SyncStrategyWatcher
   }
 
   def start_link(opts) do
@@ -37,6 +37,11 @@ defmodule FileSync.Interactions.SyncServer do
         ContentQueueWatcher,
         content_queue: :content,
         target: target
+      },
+      {
+        SyncStrategyWatcher,
+        inventory_queue: :inventory,
+        source: source
       }
     ]
   end
