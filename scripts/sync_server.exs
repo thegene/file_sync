@@ -11,11 +11,19 @@ alias FileSync.Boundaries.{
   DropBox
 }
 
+token = File.read!("tmp/dropbox_token")
+        |> String.trim
+
 source = %Source{
   contents: DropBox.FileContents,
   validators: [DropBox.ContentHashValidator],
   inventory: DropBox.Inventory,
-  opts: %{folder: "Harrison Birth", limit: 3},
+  strategy: DropBox.SyncStrategies.Paginate,
+  opts: %{
+    folder: "Harrison Birth",
+    limit: 3,
+    token: token
+  },
 }
 
 target = %Source{
@@ -27,10 +35,5 @@ target = %Source{
 {:ok, server} = SyncServer.start_link(source: source, target: target)
 
 inventory_queue = FileSync.Actions.Queue.find_queue(:inventory)
-
-DropBox.Inventory.get(%{folder: "Harrison Birth", limit: 3})
-|> elem(1)
-|> BuildInventoryQueue.push_to_queue(inventory_queue)
-
 
 IEx.pry

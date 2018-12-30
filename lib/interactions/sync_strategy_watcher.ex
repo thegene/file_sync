@@ -27,6 +27,8 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
       state.queue
     )
 
+    schedule()
+
     {:noreply, state |> Map.merge(%{last_response: last_response})}
   end
 
