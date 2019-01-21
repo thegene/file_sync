@@ -1,4 +1,8 @@
 defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
+  defstruct [
+    :folder, # The dropbox folder to paginate over
+    :limit # The number of items to request per page
+  ]
 
   alias FileSync.Interactions.Source
   alias FileSync.Actions.Queue
@@ -24,10 +28,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
   end
 
   defp list_folder(client: client, source: %Source{opts: source_opts}) do
+    settings = source_opts.strategy_opts
     %{
-      folder: source_opts[:folder],
-      limit: source_opts[:limit] || 100,
-      token: source_opts[:token]
+      folder: settings.folder,
+      limit: settings.limit || 100,
+      token: source_opts.token
     }
     |> client.request(Endpoints.ListFolder, ResponseParsers.ListFolder)
   end

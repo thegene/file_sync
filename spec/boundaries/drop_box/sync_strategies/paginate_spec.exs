@@ -10,7 +10,8 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
     Client,
     Response,
     Endpoints,
-    ResponseParsers
+    ResponseParsers,
+    Options
   }
 
   context "Given we are checking for DropBox inventory" do
@@ -27,9 +28,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
 
     let :source do
       %Source{
-        opts: %{
-          folder: "foo",
-          limit: 5,
+        opts: %Options{
+          strategy_opts: %Paginate{
+            folder: "foo",
+            limit: 5,
+          },
           token: "bar"
         },
       }
