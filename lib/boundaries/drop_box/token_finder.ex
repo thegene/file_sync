@@ -1,4 +1,4 @@
-defmodule FileSync.Boundaries.DropBox.FindToken do
+defmodule FileSync.Boundaries.DropBox.TokenFinder do
   alias FileSync.Boundaries.DropBox.Options
 
   def find(options = %Options{}, deps) do

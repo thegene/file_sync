@@ -8,20 +8,23 @@ alias FileSync.Interactions.{
 alias FileSync.Actions.Queue
 
 alias FileSync.Boundaries.DropBox.SyncStrategies.Paginate
+alias FileSync.Boundaries.DropBox.{
+  Options,
+  TokenFinder
+}
 
 {:ok, inventory_queue} = Queue.start_link(name: :inventory)
 
-token = File.read!("tmp/dropbox_token")
-        |> String.trim
+options = %Options{
+  folder: "Harrison Birth",
+  limit: 5,
+  token_file_path: "tmp/dropbox_token"
+} |> TokenFinder.find
 
 source = %Source{
   strategy: Paginate,
   queue_name: :inventory,
-  opts: %{
-    folder: "Harrison Birth",
-    limit: 5,
-    token: token
-  }
+  opts: options
 }
 
 IEx.pry
