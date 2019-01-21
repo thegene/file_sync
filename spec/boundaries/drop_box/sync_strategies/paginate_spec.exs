@@ -20,7 +20,9 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
       |> Paginate.check(
         source(),
         queue(),
-        mock_client()
+        %{
+          client: mock_client(),
+        }
       )
     end
 

@@ -1,7 +1,7 @@
 defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
   defstruct [
     :folder, # The dropbox folder to paginate over
-    :limit # The number of items to request per page
+    :limit, # The number of items to request per page
   ]
 
   alias FileSync.Interactions.Source
@@ -13,26 +13,39 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
     ResponseParsers
   }
   
-  def check(last_response, source, queue, client \\ Client)
+  def check(last_response, source, queue, deps)
 
-  def check(%{cursor: cursor}, %Source{opts: %{token: token}}, queue, client) do
-    %{cursor: cursor}
-    |> Map.merge(%{token: token})
-    |> client.request(Endpoints.ListFolderContinue, ResponseParsers.ListFolder)
+  def check(%{cursor: cursor}, source = %Source{}, queue, deps) do
+    client = deps[:client] || Client
+
+    request_with_cursor(source, cursor, client)
     |> handle_response(queue)
   end
 
-  def check(_last_response, source = %Source{}, queue, client) do
-    list_folder(client: client, source: source)
+  def check(_last_response, source = %Source{}, queue, deps) do
+    client = deps[:client] || Client
+
+    request(client: client, source: source)
     |> handle_response(queue)
   end
 
-  defp list_folder(client: client, source: %Source{opts: source_opts}) do
-    settings = source_opts.strategy_opts
+  defp request_with_cursor(%Source{opts: opts}, cursor, client) do
+    %{
+      cursor: cursor,
+      token: opts.token
+    }
+    |> client.request(
+                      Endpoints.ListFolderContinue,
+                      ResponseParsers.ListFolder
+                     )
+  end
+
+  defp request(client: client, source: %Source{opts: opts}) do
+    settings = opts.strategy_opts
     %{
       folder: settings.folder,
       limit: settings.limit || 100,
-      token: source_opts.token
+      token: opts.token
     }
     |> client.request(Endpoints.ListFolder, ResponseParsers.ListFolder)
   end
