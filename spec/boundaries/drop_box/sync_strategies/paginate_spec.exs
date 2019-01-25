@@ -31,12 +31,16 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
     let :source do
       %Source{
         opts: %Options{
-          strategy_opts: %Paginate{
-            folder: "foo",
-            limit: 5,
-          },
+          strategy_opts: strategy_opts(),
           token: "bar"
         },
+      }
+    end
+
+    let :strategy_opts do
+      %Paginate{
+        folder: "foo",
+        limit: 5,
       }
     end
 
@@ -59,6 +63,20 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
       end)
       |> allow(:request, fn(
                  %{cursor: "ABC", token: "bar"},
+                 Endpoints.ListFolderContinue,
+                 ResponseParsers.ListFolder
+               ) ->
+        {:ok, %Response{
+            body: %{
+              entries: ["foo", "bar"],
+              cursor: "ABC",
+              has_more: false
+            }
+          }
+        }
+      end)
+      |> allow(:request, fn(
+                 %{cursor: "apple", token: "bar"},
                  Endpoints.ListFolderContinue,
                  ResponseParsers.ListFolder
                ) ->
@@ -152,7 +170,28 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
                         ResponseParsers.ListFolder
                       })
       end
+    end
 
+    context "without a last response but with a cursor in the strategy opts" do
+      let last_response: %{}
+
+      let :strategy_opts do
+        %Paginate{
+          folder: "blah",
+          limit: 3,
+          cursor: "apple"
+        }
+      end
+
+      it "requests a continue on list_folder with the cursoe" do
+        check()
+        assert_received({:request,
+                        %{cursor: "apple", token: "bar"},
+                        Endpoints.ListFolderContinue,
+                        ResponseParsers.ListFolder
+                      })
+
+      end
     end
   end
 end

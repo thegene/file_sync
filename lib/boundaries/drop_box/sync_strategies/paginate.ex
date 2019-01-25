@@ -2,6 +2,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
   defstruct [
     :folder, # The dropbox folder to paginate over
     :limit, # The number of items to request per page
+    :cursor, # Optional cursor to start with
   ]
 
   alias FileSync.Interactions.Source
@@ -25,8 +26,14 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
   def check(_last_response, source = %Source{}, queue, deps) do
     client = deps[:client] || Client
 
-    request(client: client, source: source)
-    |> handle_response(queue)
+    cursor = source.opts.strategy_opts.cursor
+
+    response = case cursor do
+      nil -> request_without_cursor(source, client)
+      _ -> request_with_cursor(source, cursor, client)
+    end
+
+    handle_response(response, queue)
   end
 
   defp request_with_cursor(%Source{opts: opts}, cursor, client) do
@@ -40,7 +47,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
                      )
   end
 
-  defp request(client: client, source: %Source{opts: opts}) do
+  defp request_without_cursor(%Source{opts: opts}, client) do
     settings = opts.strategy_opts
     %{
       folder: settings.folder,
