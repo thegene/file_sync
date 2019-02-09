@@ -1,3 +1,5 @@
+Code.require_file "mock_logger.exs", "spec"
+
 defmodule FileSync.Interactions.SyncStrategyWatcherSpec do
   use ESpec
 
@@ -10,18 +12,15 @@ defmodule FileSync.Interactions.SyncStrategyWatcherSpec do
   }
   alias FileSync.Boundaries.DropBox.SyncStrategies.Paginate
 
+  alias FileSync.Spec.MockLogger
+
   context "Given a strategy and an inventory queue" do
 
     let queue: Queue.start_link |> elem(1)
 
     let source: %Source{logger: mock_logger(), strategy: mock_strategy()}
 
-    let :mock_logger do
-      Logger
-      |> double
-      |> allow(:warn, fn(_msg) -> nil end)
-      |> allow(:info, fn(_msg) -> nil end)
-    end
+    let mock_logger: MockLogger.get_mock()
 
     context "when checks are successful" do
       let :mock_strategy do

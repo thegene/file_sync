@@ -14,7 +14,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
     ResponseParsers
   }
   
-  def check(last_response, source, queue, deps)
+  def check(last_response, source, queue, deps \\ %{})
 
   def check(%{cursor: cursor}, source = %Source{}, queue, deps) do
     client = deps[:client] || Client

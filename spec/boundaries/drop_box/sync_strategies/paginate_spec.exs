@@ -1,3 +1,5 @@
+Code.require_file "mock_logger.exs", "spec"
+
 defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
   use ESpec
 
@@ -14,7 +16,11 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
     Options
   }
 
+  alias FileSync.Spec.MockLogger
+
   context "Given we are checking for DropBox inventory" do
+    let mock_logger: MockLogger.get_mock()
+
     let :check do
       last_response()
       |> Paginate.check(
@@ -34,6 +40,7 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
           strategy_opts: strategy_opts(),
           token: "bar"
         },
+        logger: mock_logger()
       }
     end
 
