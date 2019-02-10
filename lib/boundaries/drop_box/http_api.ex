@@ -16,18 +16,12 @@ defmodule FileSync.Boundaries.DropBox.HttpApi do
             )
   end
 
-  defp token_from_file do
-    File.read!("tmp/dropbox_token")
-    |> String.trim
-  end
-
   defp headers(opts) do
-    token = Map.get(opts, :token, token_from_file())
     endpoint = opts.endpoint
     strategy = endpoint.strategy
 
     [
-      "Authorization": "Bearer #{token}"
+      "Authorization": "Bearer #{opts.token}"
     ]
     |> Enum.into(strategy.headers(endpoint))
   end
