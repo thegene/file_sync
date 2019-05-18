@@ -1,38 +1,25 @@
 require IEx
 
-alias FileSync.Interactions.{
-  SyncServer,
-  Source,
-  BuildInventoryQueue
-}
+alias FileSync.Interactions.SyncServer
 
 alias FileSync.Boundaries.{
   FileSystem,
   DropBox
 }
 
-source = %Source{
-  contents: DropBox.FileContents,
-  validators: [DropBox.ContentHashValidator],
-  inventory: DropBox.Inventory,
-  strategy: DropBox.SyncStrategies.Paginate,
-  opts: %DropBox.Options{
-    strategy_opts: %DropBox.SyncStrategies.Paginate{
-      folder: "Harrison Birth",
-      limit: 3,
-    },
-    token_file_path: "tmp/dropbox_token"
-  } |> DropBox.FindToken.find,
-}
+# DropBox options:
+folder = "Harrison Birth" # The name of the folder you want to sync. Doesn't do nested folders yet
+limit = 3 # The page size for querying. Re-queries every hour
+token_file_path = "tmp/dropbox_token" # path to a file containing your dropbox api token
 
-target = %Source{
-  contents: FileSystem.FileContents,
-  validators: [FileSystem.FileSizeValidator],
-  opts: %FileSystem.Options{directory: "data"}
-}
+# FileSystem options:
+target_directory = "data" # Directory where you want to save your files
+
+
+source = DropBox.default_source(folder, limit, token_file_path)
+
+target = FileSystem.default_target(target_directory)
 
 {:ok, server} = SyncServer.start_link(source: source, target: target)
-
-inventory_queue = FileSync.Actions.Queue.find_queue(:inventory)
 
 IEx.pry
