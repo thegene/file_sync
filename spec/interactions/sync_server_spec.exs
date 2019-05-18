@@ -63,7 +63,7 @@ defmodule FileSync.Interactions.SyncServerSpec do
     let :mock_strategy do
       DropBox.SyncStrategies.Paginate
       |> double
-      |> allow(:check, fn(_response, _source, _queue, _client) -> {} end)
+      |> allow(:check, fn(_response, _source, _queue) -> {:ok, "foo"} end)
     end
 
     let source_validators: []

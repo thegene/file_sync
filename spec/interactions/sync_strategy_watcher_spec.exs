@@ -38,22 +38,27 @@ defmodule FileSync.Interactions.SyncStrategyWatcherSpec do
           ) -> {:ok, "blah"} end)
       end
 
-      it "checks the source with the given strategy" do
-        SyncStrategyWatcher.poll(%{}, source(), queue())
+      context "when the watcher polls" do
+        before do
+          SyncStrategyWatcher.poll(%{}, source(), queue())
+        end
 
-        assert_received({
-          :check,
-          %{},
-          %Source{},
-          _queue_pid
-        })
-      end
+        it "checks the source with the given strategy" do
 
-      it "logs that it is doing something" do
-        assert_received({
-          :info,
-          "Watching for new files to sync"
-        })
+          assert_received({
+            :check,
+            %{},
+            %Source{},
+            _queue_pid
+          })
+        end
+
+        it "logs that it is doing something" do
+          assert_received({
+            :info,
+            "Watching for new files to sync"
+          })
+        end
       end
 
       context "when passed the response from the first call" do
