@@ -1,11 +1,5 @@
 defmodule FileSync.Boundaries.DropBox.Client do
   alias FileSync.Boundaries.DropBox.HttpApi
-  alias FileSync.Boundaries.DropBox.Endpoints.{
-    ListFolder,
-    ListFolderContinue,
-    Download
-  }
-  alias FileSync.Boundaries.DropBox.ResponseParsers
 
   def request(opts, endpoint, parser) do
     opts

@@ -1,30 +1,32 @@
 defmodule FileSync.Boundaries.DropBox.FileContents do
 
-  require IEx
-
-  alias FileSync.Data.{FileData,InventoryItem,InventoryFolder}
+  alias FileSync.Data.{
+    FileData,
+    InventoryItem,
+    InventoryFolder
+  }
   alias FileSync.Boundaries.DropBox.{
     Client,
     SourceMeta,
     Endpoints,
-    ResponseParsers
+    ResponseParsers,
+    Options
   }
 
-  def get(item, opts \\ %{})
-  def get(%InventoryItem{path: path}, opts) do
-
-    client = Map.get(opts, :client, Client)
+  def get(item, opts, client \\ Client)
+  def get(%InventoryItem{path: path}, opts = %Options{}, client) do
 
     endpoint = Endpoints.Download
     parser = ResponseParsers.Download
 
     opts
+    |> Map.from_struct
     |> Map.merge(%{path: path})
     |> client.request(endpoint, parser)
     |> respond
   end
 
-  def get(_item = %InventoryFolder{}, _opts) do
+  def get(_item = %InventoryFolder{}, _opts, _client) do
     # folder traversal not yet implemented
   end
 

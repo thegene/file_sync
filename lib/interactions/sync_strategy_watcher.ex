@@ -16,16 +16,12 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
   @impl true
   def init(state) do
     schedule()
-    {:ok, state}
+    {:ok, poll_state(state)}
   end
 
   @impl true
   def handle_info(:poll, state) do
-    last_response = poll(
-      state.last_response,
-      state.source,
-      state.queue
-    )
+    last_response = poll_state(state)
 
     schedule()
 
@@ -52,6 +48,14 @@ defmodule FileSync.Interactions.SyncStrategyWatcher do
       source,
       queue
     ) |> handle_response(source)
+  end
+
+  defp poll_state(%{last_response: last_response, source: source, queue: queue}) do
+    poll(
+      last_response,
+      source,
+      queue
+    )
   end
 
   defp heartbeat_log(%Source{logger: logger}) do

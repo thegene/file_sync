@@ -11,19 +11,18 @@ alias FileSync.Boundaries.{
   DropBox
 }
 
-token = File.read!("tmp/dropbox_token")
-        |> String.trim
-
 source = %Source{
   contents: DropBox.FileContents,
   validators: [DropBox.ContentHashValidator],
   inventory: DropBox.Inventory,
   strategy: DropBox.SyncStrategies.Paginate,
-  opts: %{
-    folder: "Harrison Birth",
-    limit: 3,
-    token: token
-  },
+  opts: %DropBox.Options{
+    strategy_opts: %DropBox.SyncStrategies.Paginate{
+      folder: "Harrison Birth",
+      limit: 3,
+    },
+    token_file_path: "tmp/dropbox_token"
+  } |> DropBox.FindToken.find,
 }
 
 target = %Source{

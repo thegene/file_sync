@@ -7,7 +7,8 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
     Client,
     Response,
     ResponseParsers,
-    Endpoints
+    Endpoints,
+    Options
   }
   alias FileSync.Data.InventoryItem
 
@@ -15,8 +16,8 @@ defmodule FileSync.Boundaries.DropBox.FileContentsSpec do
 
   context "Given a request for file contents of an InventoryItem" do
     let item: %InventoryItem{path: "foo.txt"}
-    let subject: FileContents.get(item(), opts())
-    let opts: %{client: mock_client(), token: "bar"}
+    let subject: FileContents.get(item(), opts(), mock_client())
+    let opts: %Options{token: "bar"}
 
     context "when successful" do
       let :response_body, do:
