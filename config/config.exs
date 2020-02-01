@@ -5,7 +5,7 @@ use Mix.Config
 
 # DropBox options:
 folder = "Harrison Birth" # The name of the folder you want to sync. Doesn't do nested folders yet
-limit = 3 # The page size for querying. Re-queries every hour
+limit = 200 # The page size for querying. Re-queries every hour
 token_file_path = "tmp/dropbox_token" # path to a file containing your dropbox api token
 
 # FileSystem options:

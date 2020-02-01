@@ -16,8 +16,7 @@ defmodule FileSync.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      applications: [:httpoison],
+      extra_applications: [:logger, :httpoison],
       mod: {FileSync.Application, []}
     ]
   end
