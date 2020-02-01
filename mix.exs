@@ -8,6 +8,7 @@ defmodule FileSync.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       preferred_cli_env: [espec: :test],
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -16,7 +17,8 @@ defmodule FileSync.Mixfile do
   def application do
     [
       extra_applications: [:logger],
-      applications: [:httpoison]
+      applications: [:httpoison],
+      mod: {FileSync.Application, []}
     ]
   end
 
@@ -27,6 +29,12 @@ defmodule FileSync.Mixfile do
       {:double, "~> 0.6.5", only: :test},
       {:httpoison, "~> 0.13"},
       {:poison, "~> 3.1"}
+    ]
+  end
+
+  defp aliases do
+    [
+      test: "espec --no-start"
     ]
   end
 end

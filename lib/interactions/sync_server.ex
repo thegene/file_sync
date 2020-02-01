@@ -1,8 +1,6 @@
 defmodule FileSync.Interactions.SyncServer do
   use Supervisor
 
-  require IEx
-
   alias FileSync.Actions.Queue
   alias FileSync.Interactions.{
     ContentQueueWatcher,
@@ -16,11 +14,11 @@ defmodule FileSync.Interactions.SyncServer do
 
   @impl true
   def init(opts) do
-    build_map_from_opts(opts)
+    children_list(opts)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp build_map_from_opts(opts) do
+  defp children_list(opts) do
     source = opts |> Keyword.get(:source)
     target = opts |> Keyword.get(:target)
 

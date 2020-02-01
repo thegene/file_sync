@@ -2,7 +2,7 @@ defmodule FileSync.Boundaries.DropBox do
   alias FileSync.Boundaries.DropBox
   alias FileSync.Interactions.Source
 
-  def default_source(folder, limit, token_file_path) do
+  def build_source(%{folder: folder, limit: limit, token_file_path: token_file_path}) do
     %Source{
       contents: DropBox.FileContents,
       validators: [DropBox.ContentHashValidator],

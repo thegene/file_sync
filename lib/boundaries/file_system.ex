@@ -2,7 +2,7 @@ defmodule FileSync.Boundaries.FileSystem do
   alias FileSync.Boundaries.FileSystem
   alias FileSync.Interactions.Source
 
-  def default_target(target_directory) do
+  def build_target(%{target_directory: target_directory}) do
     %Source{
       contents: FileSystem.FileContents,
       validators: [FileSystem.FileSizeValidator],
