@@ -19,6 +19,13 @@ defmodule FileSync.Actions.Queue do
     |> handle_pop(queue)
   end
 
+  def inspect(queue) do
+    queue
+    |> get
+    |> handle_inspect
+    |> Enum.reverse
+  end
+
   def find_queue(name) do
     GenServer.whereis(name)
   end
@@ -50,5 +57,14 @@ defmodule FileSync.Actions.Queue do
 
   defp get(queue) do
     Agent.get(queue, &(&1)) 
+  end
+
+  defp handle_inspect(queue, memo \\ [])
+  defp handle_inspect({head, tail}, memo) do
+    handle_inspect(tail, [head | memo])
+  end
+
+  defp handle_inspect({}, memo) do
+    memo
   end
 end

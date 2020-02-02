@@ -2,6 +2,7 @@ defmodule FileSync.Boundaries.DropBox.ResponseParsers.ListFolder do
 
   alias FileSync.Boundaries.DropBox.Response
   alias FileSync.Data.InventoryItem
+  alias FileSync.Data.InventoryFolder
 
   def parse(%{status_code: 200, headers: headers, body: body}) do
     %Response{
@@ -19,12 +20,16 @@ defmodule FileSync.Boundaries.DropBox.ResponseParsers.ListFolder do
     }
   end
 
-  defp cast_to_inventory_item(entry) do
+  defp cast_to_inventory_item(entry = %{".tag" => "file"}) do
     %InventoryItem{
       name: entry["name"],
       path: entry["path_display"],
       size: entry["size"]
     }
+  end
+
+  defp cast_to_inventory_item(%{".tag" => "folder", "name" => name}) do
+    %InventoryFolder{name: name}
   end
 
   defp inventory_items_from_entries(entries) do

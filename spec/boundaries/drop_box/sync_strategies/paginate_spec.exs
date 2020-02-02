@@ -54,13 +54,15 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
     let(:ok_response) do
       {:ok,  %Response{
           body: %{
-            entries: ["foo", "bar"],
+            entries: found_entries(),
             cursor: "ABC",
             has_more: false
           }
         }
       }
     end
+
+    let found_entries: ["apple", "pear"]
 
     let(:initial_request) do
       fn(
@@ -106,6 +108,10 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
       context "and the request is successful" do
         let mock_client: successful_initial_client_request()
 
+        let(:enqueued_items) do
+          queue() |> Queue.inspect
+        end
+
         it "requests a list of a folder from the client" do
           check()
           assert_received({:request,
@@ -124,18 +130,12 @@ defmodule FileSync.Boundaries.DropBox.SyncStrategies.PaginateSpec do
           }}))
         end
 
-        it "enqueues the entries" do
+        it "enqueues only the item entries" do
           check()
 
-          queue()
-          |> Queue.pop
+          enqueued_items()
           |> expect
-          |> to(eq("foo"))
-
-          queue()
-          |> Queue.pop
-          |> expect
-          |> to(eq("bar"))
+          |> to(eq(found_entries()))
         end
       end
 

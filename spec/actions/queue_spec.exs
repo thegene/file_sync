@@ -71,6 +71,18 @@ defmodule FileSync.Actions.QueueSpec do
         |> not_to(be_true())
       end
 
+      it "can show us its full contents without changing its contents" do
+        queue()
+        |> Queue.inspect
+        |> expect
+        |> to(eq(["first thing", "second thing"]))
+
+        queue()
+        |> Queue.empty?
+        |> expect
+        |> not_to(be_true())
+      end
+
       context "when we pop one of them off" do
         let first_item: queue() |> Queue.pop
 
