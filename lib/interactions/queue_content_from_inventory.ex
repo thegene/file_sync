@@ -37,6 +37,7 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueue do
   defp enqueue({:error, message}, inventory_queue, _content_queue, original_item) do
     inventory_queue |> Queue.push(original_item)
 
-    {:error, "Failed getting #{original_item.name}, will retry: #{message}"}
+    {:error, "QueueContentFromInventoryQueue: file contents failed. "
+      <> "#{original_item.name} will retry: #{message}"}
   end
 end

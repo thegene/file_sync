@@ -98,8 +98,8 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
           it "returns an error message" do
             shared.message
             |> expect
-            |> to(eq({:error, "Failed getting FooFile.png, " <>
-              "will retry: validation failed"}))
+            |> to(eq({:error, "QueueContentFromInventoryQueue: file "
+              <> "contents failed. FooFile.png will retry: validation failed"}))
           end
         end
       end
@@ -117,8 +117,8 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
           it "returns an error message" do
             shared.message
             |> expect
-            |> to(eq({:error, "Failed getting FooFile.png, " <>
-              "will retry: something borked"}))
+            |> to(eq({:error, "QueueContentFromInventoryQueue: file "
+              <> "contents failed. FooFile.png will retry: something borked"}))
           end
 
           it "adds the inventory item back to the inventory queue" do
@@ -142,8 +142,8 @@ defmodule FileSync.Interactions.QueueContentFromInventoryQueueSpec do
           it "returns an error message" do
             shared.message
             |> expect
-            |> to(eq({:error, "Failed getting FooFile.png, " <>
-              "will retry: something borked"}))
+            |> to(eq({:error, "QueueContentFromInventoryQueue: file "
+              <> "contents failed. FooFile.png will retry: something borked"}))
           end
 
           it "adds the inventory item back to the inventory queue" do
