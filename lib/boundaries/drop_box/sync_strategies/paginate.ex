@@ -1,4 +1,5 @@
 defmodule FileSync.Boundaries.DropBox.SyncStrategies.Paginate do
+
   defstruct [
     :folder, # The dropbox folder to paginate over
     :limit, # The number of items to request per page
